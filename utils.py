@@ -40,18 +40,20 @@ def generate_dataset(filepath):
 # Store each instance as an element in list
 def read_dataset(filepath):
     instance_list = []
+    
+    # Read in file
     with open(filepath, "r") as rf:
         i = Instance()
         instance_list.append(i)
         for line in rf:
             spl = line.split()            
-            if len(spl) < 2:
+            if len(spl) < 2: # Blank line
                 i = Instance()
                 instance_list.append(i)
-            elif len(spl) == 2:
+            elif len(spl) == 2: # Bin dimensions
                 spl_int = [int(x) for x in spl] 
-                i.set_binsize(tuple(spl_int))
-            else:
+                i.set_binsize(spl_int)
+            else: # Item dimensions and ID
                 spl_int = [int(x) for x in spl]
                 i.add_item(tuple(spl_int))
     rf.close()
