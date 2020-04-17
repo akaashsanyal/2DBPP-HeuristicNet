@@ -1,5 +1,6 @@
 import sys
 import os
+import numpy as np
 
 # Instance class
 class Instance:
@@ -19,9 +20,10 @@ class Instance:
             print(item)
 
 # Make dataset and save to file
-def generate_dataset(filepath):
+def generate_raw_dataset(filepath):
     '''
     Format is as follows:
+    instance number
     bin_length bin_width
     item_length item_width item_id
     item_length item_width item_id
@@ -58,4 +60,46 @@ def read_dataset(filepath):
                 i.add_item(tuple(spl_int))
     rf.close()
     return instance_list
+
+# Generate features from dataset
+def generate_features(dataset):
+    
+    feature_space = []
+    # Loops over each instance
+    for i in dataset:
+        # Generate features
+        features = []
+        
+        # Item features
+        vols = [item[0]*item[1] for item in i.items]
+        print(vols)
+        # Number of items
+        features.append(len(i.items))
+
+        # Sum of item volumes
+        features.append(sum(vols))
+
+        # Min item volume
+        features.append(min(vols))
+
+        # Max item volume
+        features.append(max(vols))
+
+        # Average item volume
+        features.append(np.mean(vols))
+
+        # Standard deviation of item volumes
+        features.append(np.std(vols))
+
+        # Variance of item volumes
+        features.append(np.var(vols))
+       
+        '''
+        Idk add others
+        '''
+        print(features)
+        # Add to final feature labels
+        feature_space.append(features) 
+
+    return feature_space
 
