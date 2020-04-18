@@ -67,37 +67,137 @@ def generate_features(dataset):
     feature_space = []
     # Loops over each instance
     for i in dataset:
+
         # Generate features
         features = []
         
         # Item features
-        vols = [item[0]*item[1] for item in i.items]
-        print(vols)
+        areas = [item[0]*item[1] for item in i.items]
+        short_sides = [min(item) for item in i.items]
+        long_sides = [max(item) for item in i.items]
+        ratios = [item[0]/item[1] for item in i.items]
+        perimeters = [(2*(item[0]+item[1])) for item in i.items]
+        sides = []
+        sides.extend(short_sides)
+        sides.extend(long_sides)
+
         # Number of items
         features.append(len(i.items))
 
-        # Sum of item volumes
-        features.append(sum(vols))
+        # Sum of item areas
+        features.append(sum(areas))
 
-        # Min item volume
-        features.append(min(vols))
+        # Min item area
+        features.append(min(areas))
 
-        # Max item volume
-        features.append(max(vols))
+        # Max item area
+        features.append(max(areas))
 
-        # Average item volume
-        features.append(np.mean(vols))
+        # Average item area
+        features.append(np.mean(areas))
 
-        # Standard deviation of item volumes
-        features.append(np.std(vols))
+        # Standard deviation of item areas
+        features.append(np.std(areas))
 
-        # Variance of item volumes
-        features.append(np.var(vols))
-       
+        # Variance of item areas
+        features.append(np.var(areas))
+
+        # Sum of item perimeters
+        features.append(sum(perimeters))
+
+        # Min item perimeter
+        features.append(min(perimeters))
+
+        # Max item perimeter
+        features.append(max(perimeters))
+
+        # Average item perimeter
+        features.append(np.mean(perimeters))
+
+        # Standard deviation of item perimeters
+        features.append(np.std(perimeters))
+
+        # Variance of item perimeters
+        features.append(np.var(perimeters))
+
+        # Sum of short sides
+        features.append(sum(short_sides))
+
+        # Min short side
+        features.append(min(short_sides))
+
+        # Max short side
+        features.append(max(short_sides))
+
+        # Average short side
+        features.append(np.mean(short_sides))
+
+        # Standard deviation of short sides
+        features.append(np.std(short_sides))
+
+        # Variance of short sides
+        features.append(np.var(short_sides))
+
+        # Sum of long sides
+        features.append(sum(long_sides))
+
+        # Min long side
+        features.append(min(long_sides))
+
+        # Max long side
+        features.append(max(long_sides))
+
+        # Average long side
+        features.append(np.mean(long_sides))
+
+        # Standard deviation of long sides
+        features.append(np.std(long_sides))
+
+        # Variance of long sides
+        features.append(np.var(long_sides)
+
+        # Sum of sides
+        features.append(sum(sides))
+
+        # Min side
+        features.append(min(sides))
+
+        # Max side
+        features.append(max(sides))
+
+        # Average side
+        features.append(np.mean(sides))
+
+        # Standard deviation of sides
+        features.append(np.std(sides))
+
+        # Variance of sides
+        features.append(np.var(sides)
+
+        # Sum of ratio of sides
+        features.append(sum(ratios))
+
+        # Min ratio of sides
+        features.append(min(ratios))
+
+        # Max ratio of sides
+        features.append(max(ratios))
+
+        # Average ratio of sides
+        features.append(np.mean(ratios))
+
+        # Standard deviation of ratios
+        features.append(np.std(ratios))
+
+        # Variance of ratios
+        features.append(np.var(ratios))
+
         '''
         Idk add others
-        '''
+        
         print(features)
+        '''
+
         # Add to final feature labels
         feature_space.append(features) 
 
