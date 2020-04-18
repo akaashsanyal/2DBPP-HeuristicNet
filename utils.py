@@ -49,9 +49,11 @@ def read_dataset(filepath):
         instance_list.append(i)
         for line in rf:
             spl = line.split()            
-            if len(spl) < 2: # Blank line
+            if len(spl) == 0: # Blank line
                 i = Instance()
                 instance_list.append(i)
+            elif len(spl) == 1: # Instance number
+                continue
             elif len(spl) == 2: # Bin dimensions
                 spl_int = [int(x) for x in spl] 
                 i.set_binsize(spl_int)
@@ -71,15 +73,13 @@ def generate_features(dataset):
         # Generate features
         features = []
         
-        # Item features
-        areas = [item[0]*item[1] for item in i.items]
-        short_sides = [min(item) for item in i.items]
-        long_sides = [max(item) for item in i.items]
-        ratios = [item[0]/item[1] for item in i.items]
-        perimeters = [(2*(item[0]+item[1])) for item in i.items]
-        sides = []
-        sides.extend(short_sides)
-        sides.extend(long_sides)
+        # ITEM FEATURES
+        areas = np.array([item[0]*item[1] for item in i.items])
+        short_sides = np.array([min(item) for item in i.items])
+        long_sides = np.array([max(item) for item in i.items])
+        ratios = np.array([min(item)/max(item) for item in i.items])
+        perimeters = np.array([(2*(item[0]+item[1])) for item in i.items])
+        sides = np.append(short_sides, long_sides)
 
         # Number of items
         features.append(len(i.items))
@@ -154,16 +154,10 @@ def generate_features(dataset):
         features.append(np.std(long_sides))
 
         # Variance of long sides
-        features.append(np.var(long_sides)
+        features.append(np.var(long_sides))
 
         # Sum of sides
         features.append(sum(sides))
-
-        # Min side
-        features.append(min(sides))
-
-        # Max side
-        features.append(max(sides))
 
         # Average side
         features.append(np.mean(sides))
@@ -172,7 +166,7 @@ def generate_features(dataset):
         features.append(np.std(sides))
 
         # Variance of sides
-        features.append(np.var(sides)
+        features.append(np.var(sides))
 
         # Sum of ratio of sides
         features.append(sum(ratios))
@@ -191,10 +185,32 @@ def generate_features(dataset):
 
         # Variance of ratios
         features.append(np.var(ratios))
+        
+        # BIN FEATURES
+        # Area
+        features.append(i.binsize[0] * i.binsize[1])
+
+        # Short side
+        features.append(min(i.binsize))
+
+        # Long side
+        features.append(max(i.binsize))
+
+        # Ratio of sides
+        features.append(min(i.binsize)/max(i.binsize))
+
+        # CROSS FEATURES
+        # Average item:bin area ratio
+        features.append(np.mean(areas/(i.binsize[0] * i.binsize[1])))
+
+        # Average item:bin short side
+        features.append(np.mean(short_sides/min(i.binsize)))
+
+        # Average item:bin long side
+        features.append(np.mean(long_sides/max(i.binsize)))
 
         '''
-        Idk add others
-        
+        Idk add others maybe
         print(features)
         '''
 

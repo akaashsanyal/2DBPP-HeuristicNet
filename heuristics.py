@@ -55,5 +55,3 @@ for instance in dataset:
     # Save results
 
 
-
-print(generate_features(dataset))
