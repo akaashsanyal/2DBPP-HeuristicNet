@@ -187,8 +187,13 @@ def generate_features(dataset):
         features.append(np.var(ratios))
         
         # BIN FEATURES
+        box_perim = 2*(i.binsize[0]+i.binsize[1])
+        box_area = i.binsize[0] * i.binsize[1]
         # Area
-        features.append(i.binsize[0] * i.binsize[1])
+        features.append(box_area)
+        
+        # Perimeter
+        features.append(box_perim)
 
         # Short side
         features.append(min(i.binsize))
@@ -200,15 +205,66 @@ def generate_features(dataset):
         features.append(min(i.binsize)/max(i.binsize))
 
         # CROSS FEATURES
+        # Min item:bin area ratio
+        features.append(min(areas/box_area))
+        
+        # Max item:bin area ratio
+        features.append(max(areas/box_area))
+        
         # Average item:bin area ratio
-        features.append(np.mean(areas/(i.binsize[0] * i.binsize[1])))
+        features.append(np.mean(areas/box_area))
+        
+        # Standard deviation item:bin area ratio
+        features.append(np.std(areas/box_area))
 
+        # Variance item:bin area ratio
+        features.append(np.var(areas/box_area))
+        
+        # Min item:bin perimeter ratio
+        features.append(min(perimeters/box_perim))
+        
+        # Max item:bin perimeter ratio
+        features.append(max(perimeters/box_perim))
+        
+        # Average item:bin perimeter ratio
+        features.append(np.mean(perimeters/box_perim))
+        
+        # Standard deviation item:bin perimeter ratio
+        features.append(np.std(perimeters/box_perim))
+
+        # Variance item:bin perimeter ratio
+        features.append(np.var(perimeters/box_perim))
+
+        # Min item:bin short side
+        features.append(min(short_sides/min(i.binsize)))
+        
+        # Max item:bin short side
+        features.append(max(short_sides/min(i.binsize)))
+        
         # Average item:bin short side
         features.append(np.mean(short_sides/min(i.binsize)))
+        
+        # Standard deviation item:bin short side
+        features.append(np.std(short_sides/min(i.binsize)))
 
+        # Variance item:bin short side
+        features.append(np.var(short_sides/min(i.binsize)))
+        
+        # Min item:bin long side
+        features.append(min(long_sides/max(i.binsize)))
+        
+        # Max item:bin long side
+        features.append(max(long_sides/max(i.binsize)))
+        
         # Average item:bin long side
         features.append(np.mean(long_sides/max(i.binsize)))
+        
+        # Standard deviation item:bin long side
+        features.append(np.std(long_sides/max(i.binsize)))
 
+        # Variance item:bin long side
+        features.append(np.var(long_sides/max(i.binsize)))
+        
         '''
         Idk add others maybe
         print(features)
