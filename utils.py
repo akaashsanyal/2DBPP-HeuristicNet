@@ -22,6 +22,11 @@ class Instance:
 # Make dataset and save to file
 def generate_raw_dataset(filepath):
     '''
+    Each instance between 2-100 items
+    Biggest bin size 10x10
+    
+    
+    
     Format is as follows:
     instance number
     bin_length bin_width
