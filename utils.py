@@ -27,13 +27,11 @@ def generate_raw_dataset(filepath):
     bin_length bin_width
     item_length item_width item_id
     item_length item_width item_id
-    ...
     item_length item_width item_id
-
+    instance number
     bin_length bin_width
     item_length item_width item_id
     item_length item_width item_id
-    ...
     item_length item_width item_id
 
     Make sure there's new line between instances
@@ -49,11 +47,9 @@ def read_dataset(filepath):
         instance_list.append(i)
         for line in rf:
             spl = line.split()            
-            if len(spl) == 0: # Blank line
+            if len(spl) == 1: # Instance number
                 i = Instance()
                 instance_list.append(i)
-            elif len(spl) == 1: # Instance number
-                continue
             elif len(spl) == 2: # Bin dimensions
                 spl_int = [int(x) for x in spl] 
                 i.set_binsize(spl_int)
