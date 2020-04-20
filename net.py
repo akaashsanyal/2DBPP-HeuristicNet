@@ -7,11 +7,13 @@ from keras.callbacks import ModelCheckpoint
 from utils import *
 from heuristics import *
 
-num_features = 30
-num_heuristics = 10
-data = [] # generate features
+filepath = ""
+generate_raw_dataset(filepath)
+dataset = read_dataset(filepath)
+features = generate_features(dataset) # generate features
+num_features = len(features[0])
 labels = [] # results from heuristics
-
+num_heuristics = 10 # depends on how many we do
 
 model = Sequential()
 model.add(Dense(128, activation='softplus', input_dim=num_features))
