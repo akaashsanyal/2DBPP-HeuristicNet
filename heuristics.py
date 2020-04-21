@@ -1,5 +1,6 @@
 # Standard imports
 import sys
+import random
 import numpy as np
 import pandas as pd
 
@@ -13,7 +14,10 @@ def generate_labels(dataset):
     bin_algos = [PackingBin.BNF, PackingBin.BFF, PackingBin.BBF]
     pack_algos = [MaxRectsBl, MaxRectsBssf, MaxRectsBaf, MaxRectsBlsf]
     
+    num_heuristics = len(bin_algos) * len(pack_algos)
     labels = []
+    # Print progress
+    count = 1
     # Repeat for each heuristic
     for instance in dataset:
         instance_label = []
@@ -45,9 +49,14 @@ def generate_labels(dataset):
                 instance_label.append(len(packer))
                 
         # Save results
-        # something like labels.append(list of heuristic rankings, or just a number)
-        # Make labels one-hot
-        print(instance_label)
-        labels.append(instance_label)
-    return labels
+        indices = [i for i, x in enumerate(instance_label) if x == min(instance_label)]
+        # In a tie, randomly pick one
+        correct = random.choice(indices)
+        labels.append(correct)
+        if count%10 == 0:
+            print("Done with instance " + str(count))
+        count += 1
+    one_hot = np.zeros((len(labels), num_heuristics))
+    one_hot[np.arange(len(labels)),labels] = 1
+    return one_hot, num_heuristics
 
