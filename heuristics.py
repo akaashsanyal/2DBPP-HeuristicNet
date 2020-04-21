@@ -7,17 +7,13 @@ import pandas as pd
 from rectpack import newPacker, float2dec
 from rectpack import PackingBin, PackingMode
 from rectpack import MaxRectsBl, MaxRectsBssf, MaxRectsBaf, MaxRectsBlsf
-from rectpack import SkylineMwf, SkylineMwfl, SkylineBl, \
-    SkylineBlWm, SkylineMwfWm, SkylineMwflWm
 from rectpack import SORT_AREA, SORT_PERI, SORT_DIFF, SORT_SSIDE, \
     SORT_LSIDE, SORT_RATIO, SORT_NONE
 
 def generate_labels(dataset):
     bin_algos = [PackingBin.Global, PackingBin.BNF, PackingBin.BFF, \
                     PackingBin.BBF]
-    pack_algos = [MaxRectsBl, MaxRectsBssf, MaxRectsBaf, MaxRectsBlsf, \
-                    SkylineMwf, SkylineMwfl, SkylineBl, \
-                    SkylineBlWm, SkylineMwfWm, SkylineMwflWm]
+    pack_algos = [MaxRectsBl, MaxRectsBssf, MaxRectsBaf, MaxRectsBlsf]
     sort_algos = [SORT_AREA, SORT_PERI, SORT_DIFF, SORT_SSIDE, \
                     SORT_LSIDE, SORT_RATIO, SORT_NONE]
     labels = []
