@@ -24,13 +24,13 @@ class Instance:
 def generate_raw_dataset(file_name, num_instances = 2000, max_boxes = 100, max_bin_length = 10, max_bin_width = 10):
     f = open(file_name, "a+")
     for inc in range(num_instances):
+        f.write("+\n")
         num_boxes = random.randint(2, max_boxes)
         bin_length = random.randint(1, max_bin_length)
         bin_width = random.randint(1, max_bin_width)
         f.write(str(bin_length) + " " + str(bin_width) + "\n")
         for box in range(num_boxes):
-            f.write(str(random.randint(1, bin_length)) + " " + str(random.randint(1, bin_width)) + "\n")
-        f.write("+\n")
+            f.write(str(random.randint(1, bin_length)) + " " + str(random.randint(1, bin_width)) + " " + str(box) + "\n")
     f.close()
 
 # Store each instance as an element in list
@@ -39,8 +39,6 @@ def read_dataset(filepath):
     
     # Read in file
     with open(filepath, "r") as rf:
-        i = Instance()
-        instance_list.append(i)
         for line in rf:
             spl = line.split()            
             if len(spl) == 1: # Instance number

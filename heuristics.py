@@ -37,6 +37,9 @@ def generate_labels(dataset):
 
         # Full item list
         all_rects = packer.rect_list()
+        
+        # Evaluate performance
+
     '''    
         # Evaluate performance   
         print("INSTANCE RESULTS")
