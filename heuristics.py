@@ -7,22 +7,22 @@ import pandas as pd
 from rectpack import newPacker, float2dec
 from rectpack import PackingBin, PackingMode
 from rectpack import MaxRectsBl, MaxRectsBssf, MaxRectsBaf, MaxRectsBlsf
-from rectpack import SORT_AREA, SORT_PERI, SORT_DIFF, SORT_SSIDE, \
-    SORT_LSIDE, SORT_RATIO, SORT_NONE
+from rectpack import SORT_RATIO
 
 def generate_labels(dataset):
     bin_algos = [PackingBin.BNF, PackingBin.BFF, PackingBin.BBF]
     pack_algos = [MaxRectsBl, MaxRectsBssf, MaxRectsBaf, MaxRectsBlsf]
-    sort_algos = [SORT_AREA, SORT_PERI, SORT_DIFF, SORT_SSIDE, \
-                    SORT_LSIDE, SORT_RATIO, SORT_NONE]
+    
     labels = []
     # Repeat for each heuristic
     for instance in dataset:
+        for bin_algo in bin_algos:
+            for pack_algo in pack_algos:
         # Initialize Packer
         packer = newPacker(mode=PackingMode.Offline, \
                         bin_algo=PackingBin.BBF, \
                         pack_algo=MaxRectsBssf, \
-                        sort_algo=SORT_AREA, \
+                        sort_algo=SORT_RATIO, \
                         rotation=True)
 
         # Add bins and items to Packer
