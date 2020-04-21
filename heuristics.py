@@ -11,8 +11,7 @@ from rectpack import SORT_AREA, SORT_PERI, SORT_DIFF, SORT_SSIDE, \
     SORT_LSIDE, SORT_RATIO, SORT_NONE
 
 def generate_labels(dataset):
-    bin_algos = [PackingBin.Global, PackingBin.BNF, PackingBin.BFF, \
-                    PackingBin.BBF]
+    bin_algos = [PackingBin.BNF, PackingBin.BFF, PackingBin.BBF]
     pack_algos = [MaxRectsBl, MaxRectsBssf, MaxRectsBaf, MaxRectsBlsf]
     sort_algos = [SORT_AREA, SORT_PERI, SORT_DIFF, SORT_SSIDE, \
                     SORT_LSIDE, SORT_RATIO, SORT_NONE]
