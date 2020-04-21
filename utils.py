@@ -1,5 +1,6 @@
 import sys
 import os
+import random
 import numpy as np
 
 # Instance class
@@ -20,27 +21,17 @@ class Instance:
             print(item)
 
 # Make dataset and save to file
-def generate_raw_dataset(filepath):
-    '''
-    Each instance between 2-100 items
-    Biggest bin size 10x10
-    
-    
-    
-    Format is as follows:
-    instance number
-    bin_length bin_width
-    item_length item_width item_id
-    item_length item_width item_id
-    item_length item_width item_id
-    instance number
-    bin_length bin_width
-    item_length item_width item_id
-    item_length item_width item_id
-    item_length item_width item_id
-
-    Make sure there's new line between instances
-    '''
+def generate_raw_dataset(file_name, num_instances = 2000, max_boxes = 100, max_bin_length = 10, max_bin_width = 10):
+    f = open(file_name, "a+")
+    for inc in range(num_instances):
+        num_boxes = random.randint(2, max_boxes)
+        bin_length = random.randint(1, max_bin_length)
+        bin_width = random.randint(1, max_bin_width)
+        f.write(str(bin_length) + " " + str(bin_width) + "\n")
+        for box in range(num_boxes):
+            f.write(str(random.randint(1, bin_length)) + " " + str(random.randint(1, bin_width)) + "\n")
+        f.write("+\n")
+    f.close()
 
 # Store each instance as an element in list
 def read_dataset(filepath):
@@ -265,11 +256,6 @@ def generate_features(dataset):
 
         # Variance item:bin long side
         features.append(np.var(long_sides/max(i.binsize)))
-        
-        '''
-        Idk add others maybe
-        print(features)
-        '''
 
         # Add to final feature labels
         feature_space.append(features) 
