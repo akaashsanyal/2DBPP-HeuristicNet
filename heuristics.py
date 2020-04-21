@@ -21,8 +21,8 @@ def generate_labels(dataset):
             for pack_algo in pack_algos:
                 # Initialize Packer
                 packer = newPacker(mode=PackingMode.Offline, \
-                                bin_algo=PackingBin.BBF, \
-                                pack_algo=MaxRectsBssf, \
+                                bin_algo=bin_algo, \
+                                pack_algo=pack_algo, \
                                 sort_algo=SORT_RATIO, \
                                 rotation=True)
 
@@ -41,11 +41,13 @@ def generate_labels(dataset):
 
                 # Evaluate performance
                 # Count number of bins
-                instance_label.append(1)
                 
+                instance_label.append(len(packer))
                 
         # Save results
         # something like labels.append(list of heuristic rankings, or just a number)
+        # Make labels one-hot
+        print(instance_label)
         labels.append(instance_label)
     return labels
 

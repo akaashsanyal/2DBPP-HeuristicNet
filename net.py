@@ -8,12 +8,12 @@ from utils import *
 from heuristics import *
 
 filepath = sys.argv[1] 
-generate_raw_dataset(filepath, num_instances=4)
+generate_raw_dataset(filepath, num_instances=20, max_boxes = 100, max_bin_length = 10, max_bin_width = 10)
 dataset = read_dataset(filepath)
 features = generate_features(dataset) # generate features
 num_features = len(features[0])
-labels = [] # results from heuristics
-num_heuristics = 10 # depends on how many we do
+labels = generate_labels(dataset) # results from heuristics
+num_heuristics = 16 # depends on how many we do
 '''
 model = Sequential()
 model.add(Dense(128, activation='softplus', input_dim=num_features))
