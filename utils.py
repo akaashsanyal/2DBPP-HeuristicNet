@@ -267,8 +267,7 @@ def generate_features(dataset, save=None):
     feature_space = np.asarray(feature_space, dtype=np.float32)
 
     if save:
-        with open(save, 'wb') as fp:
-            pickle.dump(feature_space, fp)
+        pickle.dump(feature_space, open(save, 'wb'))
     
     return feature_space
 
