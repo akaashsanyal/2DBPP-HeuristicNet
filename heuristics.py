@@ -12,7 +12,7 @@ from rectpack import PackingBin, PackingMode
 from rectpack import MaxRectsBl, MaxRectsBssf, MaxRectsBaf, MaxRectsBlsf
 from rectpack import SORT_RATIO
 
-def generate_labels(dataset, save = None):
+def generate_labels(dataset, save):
     bin_algos = [PackingBin.BNF, PackingBin.BFF, PackingBin.BBF]
     pack_algos = [MaxRectsBl, MaxRectsBssf, MaxRectsBaf, MaxRectsBlsf]
     
@@ -57,9 +57,5 @@ def generate_labels(dataset, save = None):
     
     one_hot = np.zeros((len(labels), num_heuristics))
     one_hot[np.arange(len(labels)),labels] = 1
-    if save:
-        with open(save, 'wb') as fp:
-            pickle.dump(one_hot, fp)
-
-    return one_hot, num_heuristics
-
+    
+    pickle.dump([one_hot, num_heuristics], open(save, 'wb'))
