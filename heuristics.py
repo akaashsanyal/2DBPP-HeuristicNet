@@ -1,12 +1,9 @@
-# Standard imports
 import sys
-import random
 import numpy as np
 import pandas as pd
 import pickle
 from tqdm import tqdm
 
-# Rectpack imports
 from rectpack import newPacker, float2dec
 from rectpack import PackingBin, PackingMode
 from rectpack import MaxRectsBl, MaxRectsBssf, MaxRectsBaf, MaxRectsBlsf
@@ -47,7 +44,6 @@ def generate_labels(dataset, save):
 
                 # Evaluate performance
                 # Count number of bins
-                
                 instance_label.append(len(packer))
                 
         # Save results
