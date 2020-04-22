@@ -1,4 +1,6 @@
 random
+argparse
+pickle
 numpy
 pandas
 tensorflow

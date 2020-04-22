@@ -1,5 +1,6 @@
 import tensorflow as tf
 import numpy as np
+import pickle
 import keras
 from keras.models import Model, Sequential
 from keras.layers import Dropout, Dense, BatchNormalization
@@ -8,15 +9,20 @@ from utils import *
 from heuristics import *
 
 filepath = sys.argv[1] 
-print("GENERATING DATA")
-generate_raw_dataset(filepath, num_instances=10000, max_boxes = 100, max_bin_length = 10, max_bin_width = 10)
-print("READING DATA")
+#generate_raw_dataset(filepath, num_instances=25000, max_boxes = 500, max_bin_length = 10, max_bin_width = 10)
 dataset = read_dataset(filepath)
-print("GENERATING FEATURES")
-features = generate_features(dataset) # generate features
+#features = generate_features(dataset, save="features.txt") # generate features
+#'''
+with open ("features.txt", 'rb') as fp:
+    features = pickle.load(fp)
+#'''
 num_features = len(features[0])
-print("GENERATING LABELS")
-labels, num_heuristics = generate_labels(dataset) # results from heuristics
+labels, num_heuristics = generate_labels(dataset, save="labels_nonrandom.txt") # results from heuristics
+'''
+with open ("labels.txt", 'rb') as fp:
+    labels = pickle.load(fp)
+num_heuristics = labels.size
+'''
 
 print("STARTING NEURAL NETWORK")
 model = Sequential()
@@ -43,6 +49,6 @@ model.compile(optimizer='adamax', \
 
 checkpointer = ModelCheckpoint(filepath= 'model_epoch{epoch:02d}.h5', verbose=1)
 
-model.fit(data, labels, epochs=10, batch_size=16, callbacks=[checkpointer])
+model.fit(features, labels, epochs=50, batch_size=32)
 
-model.save('my_model.h5')
+model.save('nonrandom_model.h5')

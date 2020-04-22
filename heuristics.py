@@ -3,6 +3,8 @@ import sys
 import random
 import numpy as np
 import pandas as pd
+import pickle
+from tqdm import tqdm
 
 # Rectpack imports
 from rectpack import newPacker, float2dec
@@ -10,16 +12,16 @@ from rectpack import PackingBin, PackingMode
 from rectpack import MaxRectsBl, MaxRectsBssf, MaxRectsBaf, MaxRectsBlsf
 from rectpack import SORT_RATIO
 
-def generate_labels(dataset):
+def generate_labels(dataset, save = None):
     bin_algos = [PackingBin.BNF, PackingBin.BFF, PackingBin.BBF]
     pack_algos = [MaxRectsBl, MaxRectsBssf, MaxRectsBaf, MaxRectsBlsf]
     
     num_heuristics = len(bin_algos) * len(pack_algos)
     labels = []
-    # Print progress
-    count = 1
     # Repeat for each heuristic
-    for instance in dataset:
+    pbar = tqdm(dataset)
+    for instance in pbar:
+        pbar.set_description("Generating Heuristic Labels")
         instance_label = []
         for bin_algo in bin_algos:
             for pack_algo in pack_algos:
@@ -49,14 +51,15 @@ def generate_labels(dataset):
                 instance_label.append(len(packer))
                 
         # Save results
-        indices = [i for i, x in enumerate(instance_label) if x == min(instance_label)]
-        # In a tie, randomly pick one
-        correct = random.choice(indices)
+        # In a tie, choose first occurrence
+        correct = instance_label.index(min(instance_label)) 
         labels.append(correct)
-        if count%10 == 0:
-            print("Done with instance " + str(count))
-        count += 1
+    
     one_hot = np.zeros((len(labels), num_heuristics))
     one_hot[np.arange(len(labels)),labels] = 1
+    if save:
+        with open(save, 'wb') as fp:
+            pickle.dump(one_hot, fp)
+
     return one_hot, num_heuristics
 

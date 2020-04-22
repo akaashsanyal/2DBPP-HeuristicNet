@@ -2,6 +2,8 @@ import sys
 import os
 import random
 import numpy as np
+import pickle
+from tqdm import tqdm, trange
 
 # Instance class
 class Instance:
@@ -22,8 +24,10 @@ class Instance:
 
 # Make dataset and save to file
 def generate_raw_dataset(file_name, num_instances = 2000, max_boxes = 100, max_bin_length = 10, max_bin_width = 10):
-    f = open(file_name, "a+")
-    for inc in range(num_instances):
+    f = open(file_name, "w")
+    pbar = trange(num_instances)
+    for inc in pbar:
+        pbar.set_description("Generating Data")
         f.write("+\n")
         num_boxes = random.randint(2, max_boxes)
         bin_length = random.randint(1, max_bin_length)
@@ -35,6 +39,7 @@ def generate_raw_dataset(file_name, num_instances = 2000, max_boxes = 100, max_b
 
 # Store each instance as an element in list
 def read_dataset(filepath):
+    print("Reading Data")
     instance_list = []
     
     # Read in file
@@ -54,12 +59,13 @@ def read_dataset(filepath):
     return instance_list
 
 # Generate features from dataset
-def generate_features(dataset):
+def generate_features(dataset, save=None):
     
     feature_space = []
+    pbar = tqdm(dataset)
     # Loops over each instance
-    for i in dataset:
-
+    for i in pbar:
+        pbar.set_description("Generating Features")
         # Generate features
         features = []
         
@@ -254,9 +260,15 @@ def generate_features(dataset):
 
         # Variance item:bin long side
         features.append(np.var(long_sides/max(i.binsize)))
-
+        
         # Add to final feature labels
         feature_space.append(features) 
+    
+    feature_space = np.asarray(feature_space, dtype=np.float32)
 
+    if save:
+        with open(save, 'wb') as fp:
+            pickle.dump(feature_space, fp)
+    
     return feature_space
 
