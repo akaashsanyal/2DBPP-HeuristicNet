@@ -11,12 +11,12 @@ import net
 def get_args():
     p = ap.ArgumentParser()
     
-    # Train or test
+    # Generate or train or test
     p.add_argument("--mode", type=str, required=True, choices=["generate", "train", "test"],
                     help="Operating mode: generate features/labels, train, or test.")
     
     # File names
-    p.add_argument("--dataset", type=str, required=True, 
+    p.add_argument("--dataset", type=str, default="dataset.txt",
                     help="Where to save/read dataset")
     p.add_argument("--model", type=str, default="my_model.h5",
                     help="Where to save/read final neural net")
@@ -24,30 +24,37 @@ def get_args():
                     help="Where to dump/read features")
     p.add_argument("--labels", type=str, default="labels.txt",
                     help="Where to dump/read labels")
+    
+    # Optional arguments
+    p.add_argument("--num_instances", type=int, default=25000,
+                    help="Number of instances in dataset")
+    p.add_argument("--max_boxes", type=int, default=500,
+                    help="Max number of boxes per instance")
+    p.add_argument("--bin_length", type=int, default=10,
+                    help="Max bin length")
+    p.add_argument("--bin_width", type=int, default=10,
+                    help="Max bin width")
+    p.add_argument("--epochs", type=int, default=50,
+                    help="Number of epochs to train") 
 
     return p.parse_args()
 
 def generate(args):
     filepath = args.dataset
-    generate_raw_dataset(filepath, num_instances=25000, max_boxes = 500, max_bin_length = 10, max_bin_width = 10)
+    generate_raw_dataset(filepath, num_instances=args.num_instances, 
+        max_boxes=args.max_boxes, max_bin_length=args.bin_length, max_bin_width=args.bin_width)
     dataset = read_dataset(filepath)
-    features = generate_features(dataset, save=args.features) # generate features
-    num_features = len(features[0])
-    labels, num_heuristics = generate_labels(dataset, save=args.labels) # results from heuristics
-
-    return num_features, num_heuristics
-    
-    '''
-features = pickle.load(open("features.txt", 'rb'))
-
-features = pickle.load(open("labels.txt", 'rb'))
-'''
-    
+    generate_features(dataset, save=args.features) # generate features
+    generate_labels(dataset, save=args.labels) # results from heuristics
+    del dataset
 
 def train(args):
-    net.train(features_file = args.features, labels_file = args.labels, model_file = args.model)
+    net.train(features_file=args.features, labels_file=args.labels, 
+        model_file=args.model, epoch_num=args.epochs)
 
-
+def test(args):
+    net.test(features_file=args.features, labels_file=args.labels, 
+        model_file=args.model)
 
 if __name__ == "__main__":
     ARGS = get_args()
