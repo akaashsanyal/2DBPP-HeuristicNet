@@ -56,6 +56,8 @@ TESTCMD="python3 main.py \
         --labels $TESTLABELS \
         --model $MODEL"
 
+$TRAINGENERATE
+$TRAINCMD
 
-#$TRAINCMD
+#$TESTGENERATE
 #$TESTCMD
