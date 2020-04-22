@@ -59,7 +59,7 @@ def read_dataset(filepath):
     return instance_list
 
 # Generate features from dataset
-def generate_features(dataset, save=None):
+def generate_features(dataset, save):
     
     feature_space = []
     pbar = tqdm(dataset)
@@ -265,9 +265,9 @@ def generate_features(dataset, save=None):
         feature_space.append(features) 
     
     feature_space = np.asarray(feature_space, dtype=np.float32)
-
-    if save:
-        pickle.dump(feature_space, open(save, 'wb'))
+    num_features = len(feature_space[0])
+    
+    pickle.dump([feature_space, num_features], open(save, 'wb'))
     
     return feature_space
 
