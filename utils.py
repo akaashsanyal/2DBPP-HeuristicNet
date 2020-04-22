@@ -268,6 +268,3 @@ def generate_features(dataset, save):
     num_features = len(feature_space[0])
     
     pickle.dump([feature_space, num_features], open(save, 'wb'))
-    
-    return feature_space
-
