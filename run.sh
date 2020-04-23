@@ -10,7 +10,7 @@ TESTLABELS="test_labels.txt"
 MODEL="trained_model.h5"
 
 # Data generation
-TRAININSTANCE="25000"
+TRAININSTANCE="1000"
 TESTINSTANCE="5000"
 MAXBOXES="500"
 BINLENGTH="10"
@@ -18,6 +18,9 @@ BINWIDTH="10"
 
 # Training
 EPOCHS="50"
+
+# Testing
+CUSTOMEVAL="False"
 
 TRAINGENERATE="python3 main.py \
         --mode generate 
@@ -54,9 +57,10 @@ TESTCMD="python3 main.py \
         --dataset $TESTDATA \
         --features $TESTFEATURES \
         --labels $TESTLABELS \
-        --model $MODEL"
+        --model $MODEL \
+        --custom_eval $CUSTOMEVAL"
 
-$TRAINGENERATE
+#$TRAINGENERATE
 $TRAINCMD
 
 #$TESTGENERATE

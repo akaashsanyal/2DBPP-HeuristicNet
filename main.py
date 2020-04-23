@@ -36,7 +36,8 @@ def get_args():
                     help="Max bin width")
     p.add_argument("--epochs", type=int, default=50,
                     help="Number of epochs to train") 
-
+    p.add_argument("--custom_eval", default=False,
+                    help="Whether to use custom evaluation")
     return p.parse_args()
 
 def generate(args):
@@ -54,7 +55,7 @@ def train(args):
 
 def test(args):
     net.test(features_file=args.features, labels_file=args.labels, 
-        model_file=args.model)
+        model_file=args.model, custom=args.custom_eval)
 
 if __name__ == "__main__":
     ARGS = get_args()
