@@ -1,6 +1,4 @@
 import sys
-import numpy as np
-import pandas as pd
 import pickle
 from tqdm import tqdm
 
@@ -47,11 +45,6 @@ def generate_labels(dataset, save):
                 instance_label.append(len(packer))
                 
         # Save results
-        # In a tie, choose first occurrence
-        correct = instance_label.index(min(instance_label)) 
-        labels.append(correct)
+        labels.append(instance_label)
     
-    one_hot = np.zeros((len(labels), num_heuristics))
-    one_hot[np.arange(len(labels)),labels] = 1
-    
-    pickle.dump([one_hot, num_heuristics], open(save, 'wb'))
+    pickle.dump([labels, num_heuristics], open(save, 'wb'))

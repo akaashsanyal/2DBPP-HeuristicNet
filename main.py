@@ -1,5 +1,4 @@
 import sys
-import os
 import pickle
 import argparse as ap
 import numpy as np
@@ -36,7 +35,8 @@ def get_args():
                     help="Max bin width")
     p.add_argument("--epochs", type=int, default=50,
                     help="Number of epochs to train") 
-    p.add_argument("--custom_eval", default=False,
+    p.add_argument('--custom_eval', default=False, 
+                    type=lambda x: (str(x).lower() == 'true'),
                     help="Whether to use custom evaluation")
     return p.parse_args()
 
