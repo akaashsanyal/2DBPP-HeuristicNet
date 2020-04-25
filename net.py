@@ -69,15 +69,14 @@ def test(features_file, labels_file, model_file, custom=False):
         print(f"Custom testing accuracy: {100*correct_count/len(index_preds):.2f}%")
 
 
-    else:
-        # For labels with same number of bins, choose first occurrence
-        # as correct label
-        corrects = []
-        for lab in labels:
-            corrects.append(lab.index(min(lab)))
+    # For labels with same number of bins, choose first occurrence
+    # as correct label
+    corrects = []
+    for lab in labels:
+        corrects.append(lab.index(min(lab)))
 
-        one_hot = np.zeros((len(corrects), num_heuristics))
-        one_hot[np.arange(len(corrects)),corrects] = 1
+    one_hot = np.zeros((len(corrects), num_heuristics))
+    one_hot[np.arange(len(corrects)),corrects] = 1
 
-        results = model.evaluate(features, one_hot, batch_size=32)
-        print('test loss, test acc:', results)
+    results = model.evaluate(features, one_hot, batch_size=32)
+    print('test loss, test acc:', results)
