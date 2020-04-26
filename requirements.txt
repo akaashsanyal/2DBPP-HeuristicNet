@@ -4,4 +4,5 @@ pickle
 numpy
 tensorflow
 keras
+hyperas
 rectpack
