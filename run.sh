@@ -13,7 +13,7 @@ VALLABELS="val_labels.txt"
 MODEL="case2.h5"
 
 # Data generation
-TRAININSTANCE="25000"
+TRAININSTANCE="30000"
 TESTINSTANCE="1000"
 VALINSTANCE="10000"
 MAXBOXES="500"
@@ -83,7 +83,7 @@ TESTCMD="python3 main.py \
         --model $MODEL \
         --custom_eval $CUSTOMEVAL"
 
-#$TRAINGENERATE
+$TRAINGENERATE
 #$TRAINCMD
 
 $VALGENERATE
