@@ -1,5 +1,4 @@
 from hyperopt import Trials, STATUS_OK, tpe
-import keras
 from keras.datasets import fashion_mnist
 from keras.layers.core import Dense, Dropout, Activation
 from keras.models import Sequential

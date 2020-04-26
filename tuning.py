@@ -35,6 +35,7 @@ def lab_to_correct(labels, first_choice=True):
 def custom_eval(predictions, labels):
     index_preds = np.argmax(predictions, axis=1)
     corrects = []
+    correct_count = 0
     for lab in labels:
         winners = np.argwhere(lab == np.min(lab))
         corrects.append(winners.flatten().tolist())
@@ -96,18 +97,21 @@ def model(X_train, train_labels, X_val, val_labels):
     
     return {'loss': -custom_acc, 'status': STATUS_OK, 'model': model}
 
+def data():
+    features, num_features = pickle.load(open('train_features.txt', 'rb'))
+    labels, num_heuristics = pickle.load(open('train_labels.txt', 'rb'))
 
-features, num_features = pickle.load(open('train_features.txt', 'rb'))
-labels, num_heuristics = pickle.load(open('train_labels.txt', 'rb'))
+    X_train, X_val, train_labels, val_labels = train_test_split(features, labels, test_size=0.2, random_state=12345)
+    X_train = X_train.astype('float32')
+    X_val = X_val.astype('float32')
 
-X_train, X_val, train_labels, val_labels = train_test_split(features, labels, test_size=0.2, random_state=12345)
-X_train = X_train.astype('float32')
-X_val = X_val.astype('float32')
+    return X_train, train_labels, X_val, val_labels
 
 best_run, best_model = optim.minimize(model=model,
                                       data=data,
                                       algo=tpe.suggest,
-                                      max_evals=100,
+                                      max_evals=10,
+                                      functions=[custom_eval,lab_to_correct],
                                       trials=Trials())
 
 best_model.save("best_model.h5")
