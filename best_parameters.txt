@@ -1,0 +1,1 @@
+{'activate': 'relu', 'batch_size': 64, 'first_dense': 32, 'first_dense_1': 32, 'first_dense_2': 128, 'first_dropout': 0.0006802658020150926, 'first_dropout_1': 0.5141627484390456, 'first_dropout_2': 0.7287090842560637, 'lr': 0.001, 'num_hidden': 1}
