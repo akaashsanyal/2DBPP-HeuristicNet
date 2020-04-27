@@ -48,9 +48,8 @@ def generate(args):
     del dataset
 
 def train(args):
-    exec(open("tuning.py").read())
-    #net.train(features_file=args.features, labels_file=args.labels, 
-    #    model_file=args.model, epoch_num=args.epochs)
+    net.train(features_file=args.features, labels_file=args.labels, 
+        model_file=args.model, epoch_num=args.epochs)
 
 def test(args):
     net.test(features_file=args.features, labels_file=args.labels, 
