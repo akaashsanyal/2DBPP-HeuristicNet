@@ -1,0 +1,196 @@
+>>> Imports:
+#coding=utf-8
+
+try:
+    import numpy as np
+except:
+    pass
+
+try:
+    import pickle
+except:
+    pass
+
+try:
+    import random
+except:
+    pass
+
+try:
+    from sklearn.model_selection import train_test_split
+except:
+    pass
+
+try:
+    import keras
+except:
+    pass
+
+try:
+    from keras.models import load_model, Sequential
+except:
+    pass
+
+try:
+    from keras.layers import Dropout, Dense, BatchNormalization, Activation
+except:
+    pass
+
+try:
+    from keras.utils import np_utils
+except:
+    pass
+
+try:
+    from keras.metrics import top_k_categorical_accuracy
+except:
+    pass
+
+try:
+    from hyperopt import Trials, STATUS_OK, tpe
+except:
+    pass
+
+try:
+    from hyperas import optim
+except:
+    pass
+
+try:
+    from hyperas.distributions import choice, uniform
+except:
+    pass
+
+>>> Hyperas search space:
+
+def get_space():
+    return {
+        'activate': hp.choice('activate', ['relu', 'softplus']),
+        'first_dense': hp.choice('first_dense', [32, 64, 128]),
+        'first_dropout': hp.uniform('first_dropout', 0, 1),
+        'first_dense_1': hp.choice('first_dense_1', [32, 64, 128]),
+        'first_dropout_1': hp.uniform('first_dropout_1', 0, 1),
+        'num_hidden': hp.choice('num_hidden', [0,1,2,3]),
+        'first_dense_2': hp.choice('first_dense_2', [32, 64, 128]),
+        'first_dropout_2': hp.uniform('first_dropout_2', 0, 1),
+        'lr': hp.choice('lr', [10**-3, 10**-2, 10**-1]),
+        'batch_size': hp.choice('batch_size', [64,128,256]),
+    }
+
+>>> Functions
+   1: def custom_eval(predictions, labels):
+   2:     index_preds = np.argmax(predictions, axis=1)
+   3:     corrects = []
+   4:     correct_count = 0
+   5:     for lab in labels:
+   6:         winners = np.argwhere(lab == np.min(lab))
+   7:         corrects.append(winners.flatten().tolist())
+   8:     for p, c in zip(index_preds, corrects):
+   9:         if p in c:
+  10:             correct_count+=1
+  11:     
+  12:     return correct_count/len(index_preds)
+  13: 
+  14: def lab_to_correct(labels, first_choice=True):
+  15:     if first_choice:
+  16:         # For labels with same number of bins, choose first occurrence
+  17:         # as correct label
+  18:         corrects = []
+  19:         for lab in labels:
+  20:             corrects.append(lab.index(min(lab)))
+  21:     else:
+  22:         # For labels with same number of bins, choose random occurrence
+  23:         # as correct label
+  24:         corrects = []
+  25:         for lab in labels:
+  26:             m = min(lab)
+  27:             min_indices = [i for i, x in enumerate(lab) if x == m]
+  28:             corrects.append(random.choice(min_indices))
+  29: 
+  30:     return corrects
+  31: 
+  32: def top3(y_true, y_pred):
+  33:     return top_k_categorical_accuracy(y_true, y_pred, k=3) 
+  34: 
+  35: 
+>>> Data
+  1: 
+  2: features, num_features = pickle.load(open('train_features.txt', 'rb'))
+  3: labels, num_heuristics = pickle.load(open('train_labels.txt', 'rb'))
+  4: 
+  5: X_train, X_val, train_labels, val_labels = train_test_split(features, labels, test_size=0.2, random_state=12345)
+  6: X_train = X_train.astype('float32')
+  7: X_val = X_val.astype('float32')
+  8: 
+  9: 
+ 10: 
+ 11: 
+>>> Resulting replaced keras model:
+
+   1: def keras_fmin_fnct(space):
+   2: 
+   3:     activate = space['activate']
+   4:     first_dense = space['first_dense']
+   5:     first_dropout = space['first_dropout']
+   6:     hidden_dense = space['first_dense_1']
+   7:     hidden_dropout = space['first_dropout_1']
+   8:     num_hidden = space['num_hidden']
+   9:     last_dense = space['first_dense_2']
+  10:     last_dropout = space['first_dropout_2']
+  11: 
+  12:     model = Sequential()
+  13:     model.add(Dense(first_dense, input_dim=num_features))
+  14:     model.add(Activation(activate))
+  15:     model.add(BatchNormalization())
+  16:     model.add(Dropout(first_dropout))
+  17:     
+  18:     if num_hidden == 0:
+  19:         model.add(Dense(hidden_dense))
+  20:         model.add(Activation(activate))
+  21:         model.add(BatchNormalization())
+  22:         model.add(Dropout(hidden_dropout))    
+  23:         if num_hidden != 1:
+  24:             model.add(Dense(hidden_dense))
+  25:             model.add(Activation(activate))
+  26:             model.add(BatchNormalization())
+  27:             model.add(Dropout(hidden_dropout))
+  28:             if num_hidden != 2:
+  29:                 model.add(Dense(hidden_dense))
+  30:                 model.add(Activation(activate))
+  31:                 model.add(BatchNormalization())
+  32:                 model.add(Dropout(hidden_dropout))
+  33:     
+  34:     model.add(Dense(last_dense, input_dim=num_features))
+  35:     model.add(Activation(activate))
+  36:     model.add(BatchNormalization())
+  37:     model.add(Dropout(last_dropout))
+  38: 
+  39:     model.add(Dense(num_heuristics, activation='softmax'))
+  40: 
+  41:     adam = keras.optimizers.Adam(lr=space['lr'])
+  42: 
+  43:     model.compile(loss='categorical_crossentropy', metrics = [top3], optimizer=adam)
+  44:     
+  45:     first_choice = False 
+  46:     
+  47:     Y_train = np_utils.to_categorical(lab_to_correct(train_labels, first_choice), num_heuristics)
+  48:     Y_val = np_utils.to_categorical(lab_to_correct(val_labels, first_choice), num_heuristics)
+  49:     
+  50:     model.fit(X_train, Y_train,
+  51:               batch_size=space['batch_size'],
+  52:               epochs=50,
+  53:               verbose=0,
+  54:               validation_data=(X_val, Y_val))
+  55: 
+  56:     predictions = model.predict(X_val)
+  57:     custom_acc = custom_eval(predictions, val_labels)
+  58:     
+  59:     score, acc_top3 = model.evaluate(X_val, Y_val, verbose=0)
+  60:     
+  61:     log_file = open('log_file.txt', 'a')
+  62:     print('Custom validation accuracy:', custom_acc, file = log_file)
+  63:     print('Top 3 validation accuracy:', acc_top3, file = log_file)
+  64:     print('_________________________', file = log_file)
+  65:     log_file.close()
+  66:     return {'loss': -custom_acc, 'status': STATUS_OK, 'model': model}
+  67: 

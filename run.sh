@@ -1,13 +1,13 @@
 #!/bin/bash
 
 # File names
-TRAINDATA="train_data.txt"
-TESTDATA="test_data.txt"
-TRAINFEATURES="train_features.txt"
-TESTFEATURES="test_features.txt"
-TRAINLABELS="train_labels.txt"
-TESTLABELS="test_labels.txt"
-MODEL="best_model.h5"
+TRAINDATA="data/train_data.txt"
+TESTDATA="data/test_data.txt"
+TRAINFEATURES="data/train_features.txt"
+TESTFEATURES="data/test_features.txt"
+TRAINLABELS="data/train_labels.txt"
+TESTLABELS="data/test_labels.txt"
+MODEL="results/best_model.h5"
 
 # Data generation
 TRAININSTANCE="30000"
@@ -30,7 +30,7 @@ TRAINGENERATE="python3 main.py \
         --bin_length $BINLENGTH \
         --bin_width $BINWIDTH"
         
-TRAINCMD="python3 main.py \
+OLDTRAINCMD="python3 main.py \
         --mode train 
         --dataset $TRAINDATA \
         --features $TRAINFEATURES \
@@ -57,7 +57,7 @@ TESTCMD="python3 main.py \
         --model $MODEL"
 
 #$TRAINGENERATE
-$TRAINCMD
+#$OLDTRAINCMD
 
 #$TESTGENERATE
 #$TESTCMD
