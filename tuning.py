@@ -9,10 +9,14 @@ import keras
 from keras.models import load_model, Sequential
 from keras.layers import Dropout, Dense, BatchNormalization, Activation
 from keras.utils import np_utils
+from keras.metrics import top_k_categorical_accuracy
 
 from hyperopt import Trials, STATUS_OK, tpe
 from hyperas import optim
 from hyperas.distributions import choice, uniform
+
+def top3(y_true, y_pred):
+    return top_k_categorical_accuracy(y_true, y_pred, k=3) 
 
 def lab_to_correct(labels, first_choice=True):
     if first_choice:
@@ -46,55 +50,67 @@ def custom_eval(predictions, labels):
     return correct_count/len(index_preds)
 
 def model(X_train, train_labels, X_val, val_labels):
-    model = Sequential()
-    model.add(Dense({{choice([32, 64, 128])}}, input_dim=num_features))
-    model.add(Activation({{choice(['relu', 'softplus'])}}))
-    model.add(BatchNormalization())
-    model.add(Dropout({{uniform(0, 1)}}))
-    model.add(Dense({{choice([32, 64, 128])}}))
-    model.add(Activation({{choice(['relu', 'softplus'])}}))
-    model.add(BatchNormalization())
-    model.add(Dropout({{uniform(0, 1)}}))
+    
+    activate = {{choice(['relu', 'softplus'])}}
+    first_dense = {{choice([32, 64, 128])}}
+    first_dropout = {{uniform(0, 1)}}
+    hidden_dense = {{choice([32, 64, 128])}}
+    hidden_dropout = {{uniform(0, 1)}}
+    num_hidden = {{choice([0,1,2,3])}}
+    last_dense = {{choice([32, 64, 128])}}
+    last_dropout = {{uniform(0, 1)}}
 
-    if {{choice(['two', 'three'])}} == 'three':
-        model.add(Dense({{choice([32, 64, 128])}}))
-        model.add(Activation({{choice(['relu', 'softplus'])}}))
+    model = Sequential()
+    model.add(Dense(first_dense, input_dim=num_features))
+    model.add(Activation(activate))
+    model.add(BatchNormalization())
+    model.add(Dropout(first_dropout))
+    
+    if num_hidden == 0:
+        model.add(Dense(hidden_dense))
+        model.add(Activation(activate))
         model.add(BatchNormalization())
-        model.add(Dropout({{uniform(0, 1)}}))
-        if {{choice(['three', 'four'])}} == 'four':
-            model.add(Dense({{choice([32, 64, 128])}}))
-            model.add(Activation({{choice(['relu', 'softplus'])}}))
+        model.add(Dropout(hidden_dropout))    
+        if num_hidden != 1:
+            model.add(Dense(hidden_dense))
+            model.add(Activation(activate))
             model.add(BatchNormalization())
-            model.add(Dropout({{uniform(0, 1)}}))
+            model.add(Dropout(hidden_dropout))
+            if num_hidden != 2:
+                model.add(Dense(hidden_dense))
+                model.add(Activation(activate))
+                model.add(BatchNormalization())
+                model.add(Dropout(hidden_dropout))
+    
+    model.add(Dense(last_dense, input_dim=num_features))
+    model.add(Activation(activate))
+    model.add(BatchNormalization())
+    model.add(Dropout(last_dropout))
 
     model.add(Dense(num_heuristics, activation='softmax'))
 
     adam = keras.optimizers.Adam(lr={{choice([10**-3, 10**-2, 10**-1])}})
-    rmsprop = keras.optimizers.RMSprop(lr={{choice([10**-3, 10**-2, 10**-1])}})
 
-    choiceval = {{choice(['adam', 'rmsprop'])}}
-    if choiceval == 'adam':
-        optim = adam
-    else:
-        optim = rmsprop
-
-    model.compile(loss='categorical_crossentropy', metrics=['accuracy'],optimizer=optim)
+    model.compile(loss='categorical_crossentropy', metrics = [top3], optimizer=adam)
     
-    Y_train = np_utils.to_categorical(lab_to_correct(train_labels), num_heuristics)
-    Y_val = np_utils.to_categorical(lab_to_correct(val_labels), num_heuristics)
+    first_choice = False 
+    
+    Y_train = np_utils.to_categorical(lab_to_correct(train_labels, first_choice), num_heuristics)
+    Y_val = np_utils.to_categorical(lab_to_correct(val_labels, first_choice), num_heuristics)
     
     model.fit(X_train, Y_train,
-              batch_size=256,
-              nb_epoch=30,
-              verbose=2,
+              batch_size={{choice([64,128,256])}},
+              epochs=50,
+              verbose=0,
               validation_data=(X_val, Y_val))
 
     predictions = model.predict(X_val)
     custom_acc = custom_eval(predictions, val_labels)
     
-    score, acc = model.evaluate(X_val, Y_val, verbose=0)
+    score, acc_top3 = model.evaluate(X_val, Y_val, verbose=0)
+
     print('Custom test accuracy:', custom_acc)
-    
+    print('Top 3 accuracy:', acc_top3)
     return {'loss': -custom_acc, 'status': STATUS_OK, 'model': model}
 
 def data():
@@ -110,9 +126,12 @@ def data():
 best_run, best_model = optim.minimize(model=model,
                                       data=data,
                                       algo=tpe.suggest,
-                                      max_evals=10,
-                                      functions=[custom_eval,lab_to_correct],
+                                      max_evals=500,
+                                      functions=[custom_eval,lab_to_correct,top3],
                                       trials=Trials())
 
 best_model.save("best_model.h5")
-print(best_run)
+f = open('best_parameters.txt', 'w') 
+print(best_run, file = f)
+f.close()
+
