@@ -17,7 +17,7 @@ def get_args():
     # File names
     p.add_argument("--dataset", type=str, default="dataset.txt",
                     help="Where to save/read dataset")
-    p.add_argument("--model", type=str, default="my_model.h5",
+    p.add_argument("--model", type=str, default="best_model.h5",
                     help="Where to save/read final neural net")
     p.add_argument("--features", type=str, default="features.txt",
                     help="Where to dump/read features")
@@ -35,9 +35,7 @@ def get_args():
                     help="Max bin width")
     p.add_argument("--epochs", type=int, default=50,
                     help="Number of epochs to train") 
-    p.add_argument('--custom_eval', default=False, 
-                    type=lambda x: (str(x).lower() == 'true'),
-                    help="Whether to use custom evaluation")
+
     return p.parse_args()
 
 def generate(args):
@@ -50,12 +48,13 @@ def generate(args):
     del dataset
 
 def train(args):
-    net.train(features_file=args.features, labels_file=args.labels, 
-        model_file=args.model, epoch_num=args.epochs)
+    exec(open("tuning.py").read())
+    #net.train(features_file=args.features, labels_file=args.labels, 
+    #    model_file=args.model, epoch_num=args.epochs)
 
 def test(args):
     net.test(features_file=args.features, labels_file=args.labels, 
-        model_file=args.model, custom=args.custom_eval)
+        model_file=args.model)
 
 if __name__ == "__main__":
     ARGS = get_args()
