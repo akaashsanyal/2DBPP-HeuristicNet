@@ -1,6 +1,5 @@
 import numpy as np
 import pickle
-from tqdm import tqdm
 import random
 
 from sklearn.model_selection import train_test_split
@@ -50,7 +49,6 @@ def custom_eval(predictions, labels):
     return correct_count/len(index_preds)
 
 def model(X_train, train_labels, X_val, val_labels):
-    
     activate = {{choice(['relu', 'softplus'])}}
     first_dense = {{choice([32, 64, 128])}}
     first_dropout = {{uniform(0, 1)}}
@@ -108,9 +106,12 @@ def model(X_train, train_labels, X_val, val_labels):
     custom_acc = custom_eval(predictions, val_labels)
     
     score, acc_top3 = model.evaluate(X_val, Y_val, verbose=0)
-
-    print('Custom test accuracy:', custom_acc)
-    print('Top 3 accuracy:', acc_top3)
+    
+    log_file = open('log_file.txt', 'a')
+    print('Custom validation accuracy:', custom_acc, file = log_file)
+    print('Top 3 validation accuracy:', acc_top3, file = log_file)
+    print('_________________________', file = log_file)
+    log_file.close()
     return {'loss': -custom_acc, 'status': STATUS_OK, 'model': model}
 
 def data():
@@ -127,9 +128,9 @@ best_run, best_model = optim.minimize(model=model,
                                       data=data,
                                       algo=tpe.suggest,
                                       max_evals=500,
+                                      eval_space=True,
                                       functions=[custom_eval,lab_to_correct,top3],
                                       trials=Trials())
-
 best_model.save("best_model.h5")
 f = open('best_parameters.txt', 'w') 
 print(best_run, file = f)
