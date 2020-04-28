@@ -1,6 +1,7 @@
 import numpy as np
 import pickle
 import random
+import sys
 
 from sklearn.model_selection import train_test_split
 
@@ -13,6 +14,10 @@ from keras.metrics import top_k_categorical_accuracy
 from hyperopt import Trials, STATUS_OK, tpe
 from hyperas import optim
 from hyperas.distributions import choice, uniform
+
+model_file = sys.argv[1]
+param_file = sys.argv[2]
+eval_num = int(sys.argv[3])
 
 def top3(y_true, y_pred):
     return top_k_categorical_accuracy(y_true, y_pred, k=3) 
@@ -127,12 +132,12 @@ def data():
 best_run, best_model = optim.minimize(model=model,
                                       data=data,
                                       algo=tpe.suggest,
-                                      max_evals=500,
+                                      max_evals=eval_num,
                                       eval_space=True,
                                       functions=[custom_eval,lab_to_correct,top3],
                                       trials=Trials())
-best_model.save("results/best_model.h5")
-f = open('results/best_parameters.txt', 'w') 
+best_model.save(model_file)
+f = open(param_file, 'w') 
 print(best_run, file = f)
 f.close()
 

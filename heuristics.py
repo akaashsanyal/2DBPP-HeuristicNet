@@ -43,7 +43,6 @@ def generate_labels(dataset, save):
                 # Evaluate performance
                 # Count number of bins
                 instance_label.append(len(packer))
-                
         # Save results
         labels.append(instance_label)
     

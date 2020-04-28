@@ -2,6 +2,7 @@ import sys
 import pickle
 import argparse as ap
 import numpy as np
+import subprocess
 
 from utils import *
 from heuristics import *
@@ -23,7 +24,11 @@ def get_args():
                     help="Where to dump/read features")
     p.add_argument("--labels", type=str, default="labels.txt",
                     help="Where to dump/read labels")
-    
+    p.add_argument("--params", type=str, default="params.txt",
+                    help="Where to save parameters of final model")
+    p.add_argument("--evaluation", type=str, default="evaluation.txt",
+                    help="Where to save evaluation metrics of final model")
+
     # Optional arguments
     p.add_argument("--num_instances", type=int, default=25000,
                     help="Number of instances in dataset")
@@ -33,8 +38,8 @@ def get_args():
                     help="Max bin length")
     p.add_argument("--bin_width", type=int, default=10,
                     help="Max bin width")
-    p.add_argument("--epochs", type=int, default=50,
-                    help="Number of epochs to train") 
+    p.add_argument("--eval_num", type=int, default=500,
+                    help="Number of evaluations for hyperparameter search") 
 
     return p.parse_args()
 
@@ -48,12 +53,11 @@ def generate(args):
     del dataset
 
 def train(args):
-    net.train(features_file=args.features, labels_file=args.labels, 
-        model_file=args.model, epoch_num=args.epochs)
+    subprocess.Popen(['./tune.sh %s %s %s' %(args.model,args.params,args.eval_num)], shell = True)
 
 def test(args):
     net.test(features_file=args.features, labels_file=args.labels, 
-        model_file=args.model)
+        model_file=args.model, results_file=args.evaluation)
 
 if __name__ == "__main__":
     ARGS = get_args()

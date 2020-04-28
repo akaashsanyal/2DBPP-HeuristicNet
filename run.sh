@@ -8,6 +8,8 @@ TESTFEATURES="data/test_features.txt"
 TRAINLABELS="data/train_labels.txt"
 TESTLABELS="data/test_labels.txt"
 MODEL="results/best_model.h5"
+PARAMS="results/best_params.txt"
+EVALUATION="results/evaluation.txt"
 
 # Data generation
 TRAININSTANCE="30000"
@@ -17,7 +19,7 @@ BINLENGTH="20"
 BINWIDTH="20"
 
 # Training
-EPOCHS="50"
+EVALS="500"
 
 TRAINGENERATE="python3 main.py \
         --mode generate 
@@ -30,13 +32,14 @@ TRAINGENERATE="python3 main.py \
         --bin_length $BINLENGTH \
         --bin_width $BINWIDTH"
         
-OLDTRAINCMD="python3 main.py \
+TRAINCMD="python3 main.py \
         --mode train 
         --dataset $TRAINDATA \
         --features $TRAINFEATURES \
         --labels $TRAINLABELS \
         --model $MODEL \
-        --epochs $EPOCHS"
+        --params $PARAMS \
+        --eval_num $EVALS"
         
 TESTGENERATE="python3 main.py \
         --mode generate 
@@ -54,10 +57,11 @@ TESTCMD="python3 main.py \
         --dataset $TESTDATA \
         --features $TESTFEATURES \
         --labels $TESTLABELS \
-        --model $MODEL"
+        --model $MODEL \
+        --evaluation $EVALUATION"
 
 #$TRAINGENERATE
-#$OLDTRAINCMD
+#$TRAINCMD
 
 #$TESTGENERATE
 #$TESTCMD
