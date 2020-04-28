@@ -112,7 +112,7 @@ def model(X_train, train_labels, X_val, val_labels):
     
     score, acc_top3 = model.evaluate(X_val, Y_val, verbose=0)
     
-    log_file = open('results/log_file.txt', 'a')
+    log_file = open('bigresults/log_file.txt', 'a')
     print('Custom validation accuracy:', custom_acc, file = log_file)
     print('Top 3 validation accuracy:', acc_top3, file = log_file)
     print('_________________________', file = log_file)
@@ -120,8 +120,8 @@ def model(X_train, train_labels, X_val, val_labels):
     return {'loss': -custom_acc, 'status': STATUS_OK, 'model': model}
 
 def data():
-    features, num_features = pickle.load(open('data/train_features.txt', 'rb'))
-    labels, num_heuristics = pickle.load(open('data/train_labels.txt', 'rb'))
+    features, num_features = pickle.load(open('bigdata/train_features.txt', 'rb'))
+    labels, num_heuristics = pickle.load(open('bigdata/train_labels.txt', 'rb'))
 
     X_train, X_val, train_labels, val_labels = train_test_split(features, labels, test_size=0.2, random_state=12345)
     X_train = X_train.astype('float32')

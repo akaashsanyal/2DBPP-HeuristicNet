@@ -1,22 +1,22 @@
 #!/bin/bash
 
 # File names
-TRAINDATA="data/train_data.txt"
-TESTDATA="data/test_data.txt"
-TRAINFEATURES="data/train_features.txt"
-TESTFEATURES="data/test_features.txt"
-TRAINLABELS="data/train_labels.txt"
-TESTLABELS="data/test_labels.txt"
-MODEL="results/best_model.h5"
-PARAMS="results/best_params.txt"
-EVALUATION="results/evaluation.txt"
+TRAINDATA="bigdata/train_data.txt"
+TESTDATA="bigdata/test_data.txt"
+TRAINFEATURES="bigdata/train_features.txt"
+TESTFEATURES="bigdata/test_features.txt"
+TRAINLABELS="bigdata/train_labels.txt"
+TESTLABELS="bigdata/test_labels.txt"
+MODEL="bigresults/best_model.h5"
+PARAMS="bigresults/best_params.txt"
+EVALUATION="bigresults/evaluation.txt"
 
 # Data generation
 TRAININSTANCE="30000"
 TESTINSTANCE="10000"
-MAXBOXES="500"
-BINLENGTH="20"
-BINWIDTH="20"
+MAXBOXES="1500"
+BINLENGTH="40"
+BINWIDTH="40"
 
 # Training
 EVALS="500"
@@ -60,8 +60,13 @@ TESTCMD="python3 main.py \
         --model $MODEL \
         --evaluation $EVALUATION"
 
-#$TRAINGENERATE
-#$TRAINCMD
+NEWTRAIN="python3 tuning.py $MODEL $PARAMS $EVALS" 
 
-#$TESTGENERATE
+$TRAINGENERATE
+$TESTGENERATE
+
+$NEWTRAIN
+$TESTCMD
+
+#$TRAINCMD
 #$TESTCMD

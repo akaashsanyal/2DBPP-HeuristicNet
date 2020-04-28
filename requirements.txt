@@ -6,4 +6,5 @@ pickle
 random
 rectpack
 sklearn
+subprocess
 tensorflow
