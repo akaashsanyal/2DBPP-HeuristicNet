@@ -11,7 +11,7 @@ from keras.layers import Dropout, Dense, BatchNormalization, Activation
 from keras.utils import np_utils
 from keras.metrics import top_k_categorical_accuracy
 
-model_file = sys.argv[1]
+import matplotlib.pyplot as plt
 
 def top3(y_true, y_pred):
     return top_k_categorical_accuracy(y_true, y_pred, k=3) 
@@ -47,19 +47,22 @@ def custom_eval(predictions, labels):
     
     return correct_count/len(index_preds)
 
-X, num_features = pickle.load(open('bigdata/train_features.txt', 'rb'))
+
+test_X, num_features = pickle.load(open('bigdata/test_features.txt', 'rb'))
+test_labels, num_heuristics = pickle.load(open('bigdata/test_labels.txt', 'rb'))
+
+features, num_features = pickle.load(open('bigdata/train_features.txt', 'rb'))
 labels, num_heuristics = pickle.load(open('bigdata/train_labels.txt', 'rb'))
 
-X = X.astype('float32')
-
-X, labels = data()
+X_train, X_val, train_labels, val_labels = train_test_split(features, labels, test_size=0.2, random_state=12345)
+X_train = X_train.astype('float32')
+X_val = X_val.astype('float32')
 
 activate = 'relu'
 first_dense = 32 
-first_dropout = {{uniform(0, 1)}}
+first_dropout = 0.04697373821486008
 hidden_dense = 32
-hidden_dropout = {{uniform(0, 1)}}
-num_hidden = {{choice([0,1,2,3])}}
+hidden_dropout = 0.02213872171606842
 
 model = Sequential()
 model.add(Dense(first_dense, input_dim=num_features))
@@ -67,36 +70,41 @@ model.add(Activation(activate))
 model.add(BatchNormalization())
 model.add(Dropout(first_dropout))
 
-if num_hidden != 0:
-    model.add(Dense(hidden_dense))
-    model.add(Activation(activate))
-    model.add(BatchNormalization())
-    model.add(Dropout(hidden_dropout))    
-    if num_hidden != 1:
-        model.add(Dense(hidden_dense))
-        model.add(Activation(activate))
-        model.add(BatchNormalization())
-        model.add(Dropout(hidden_dropout))
-        if num_hidden != 2:
-            model.add(Dense(hidden_dense))
-            model.add(Activation(activate))
-            model.add(BatchNormalization())
-            model.add(Dropout(hidden_dropout))
+model.add(Dense(hidden_dense))
+model.add(Activation(activate))
+model.add(BatchNormalization())
+model.add(Dropout(hidden_dropout))    
+
+model.add(Dense(hidden_dense))
+model.add(Activation(activate))
+model.add(BatchNormalization())
+model.add(Dropout(hidden_dropout))
 
 model.add(Dense(num_heuristics, activation='softmax'))
 
-adam = keras.optimizers.Adam(lr={{choice([10**-3, 10**-2, 10**-1])}})
+adam = keras.optimizers.Adam(lr=0.01)
 
 model.compile(loss='categorical_crossentropy', metrics = [top3], optimizer=adam)
 
 first_choice = False 
 
-Y = np_utils.to_categorical(lab_to_correct(labels, first_choice), num_heuristics)
+Y_train = np_utils.to_categorical(lab_to_correct(train_labels, first_choice), num_heuristics)
+Y_val = np_utils.to_categorical(lab_to_correct(val_labels, first_choice), num_heuristics)
 
-model.fit(X, Y,
+history = model.fit(X_train, Y_train,
           batch_size=128,
-          epochs=50,
-          verbose=0)
+          epochs=5,
+          verbose=2,
+          validation_data=(X_val, Y_val))
+'''
+# Plot history: MAE
+plt.plot(history.history['loss'], label='Loss (testing data)')
+plt.plot(history.history['val_loss'], label='Loss (validation data)')
+plt.title('MAE for Chennai Reservoir Levels')
+plt.ylabel('MAE value')
+plt.xlabel('Epoch')
+plt.legend(loc="best")
+plt.show()
 
     predictions = model.predict(X_val)
     custom_acc = custom_eval(predictions, val_labels)
@@ -106,5 +114,6 @@ model.fit(X, Y,
 
 
 model.save("new_best.h5")
-
+'''
+print(history)
 
