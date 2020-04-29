@@ -47,83 +47,64 @@ def custom_eval(predictions, labels):
     
     return correct_count/len(index_preds)
 
-def model(X_train, train_labels, X_val, val_labels):
-    activate = 'relu'
-    first_dense = 32 
-    first_dropout = {{uniform(0, 1)}}
-    hidden_dense = 32
-    hidden_dropout = {{uniform(0, 1)}}
-    num_hidden = {{choice([0,1,2,3])}}
+X, num_features = pickle.load(open('bigdata/train_features.txt', 'rb'))
+labels, num_heuristics = pickle.load(open('bigdata/train_labels.txt', 'rb'))
 
-    model = Sequential()
-    model.add(Dense(first_dense, input_dim=num_features))
+X = X.astype('float32')
+
+X, labels = data()
+
+activate = 'relu'
+first_dense = 32 
+first_dropout = {{uniform(0, 1)}}
+hidden_dense = 32
+hidden_dropout = {{uniform(0, 1)}}
+num_hidden = {{choice([0,1,2,3])}}
+
+model = Sequential()
+model.add(Dense(first_dense, input_dim=num_features))
+model.add(Activation(activate))
+model.add(BatchNormalization())
+model.add(Dropout(first_dropout))
+
+if num_hidden != 0:
+    model.add(Dense(hidden_dense))
     model.add(Activation(activate))
     model.add(BatchNormalization())
-    model.add(Dropout(first_dropout))
-    
-    if num_hidden != 0:
+    model.add(Dropout(hidden_dropout))    
+    if num_hidden != 1:
         model.add(Dense(hidden_dense))
         model.add(Activation(activate))
         model.add(BatchNormalization())
-        model.add(Dropout(hidden_dropout))    
-        if num_hidden != 1:
+        model.add(Dropout(hidden_dropout))
+        if num_hidden != 2:
             model.add(Dense(hidden_dense))
             model.add(Activation(activate))
             model.add(BatchNormalization())
             model.add(Dropout(hidden_dropout))
-            if num_hidden != 2:
-                model.add(Dense(hidden_dense))
-                model.add(Activation(activate))
-                model.add(BatchNormalization())
-                model.add(Dropout(hidden_dropout))
-    
-    model.add(Dense(num_heuristics, activation='softmax'))
 
-    adam = keras.optimizers.Adam(lr={{choice([10**-3, 10**-2, 10**-1])}})
+model.add(Dense(num_heuristics, activation='softmax'))
 
-    model.compile(loss='categorical_crossentropy', metrics = [top3], optimizer=adam)
-    
-    first_choice = False 
-    
-    Y_train = np_utils.to_categorical(lab_to_correct(train_labels, first_choice), num_heuristics)
-    Y_val = np_utils.to_categorical(lab_to_correct(val_labels, first_choice), num_heuristics)
-    
-    model.fit(X_train, Y_train,
-              batch_size=128,
-              epochs=50,
-              verbose=0)
+adam = keras.optimizers.Adam(lr={{choice([10**-3, 10**-2, 10**-1])}})
+
+model.compile(loss='categorical_crossentropy', metrics = [top3], optimizer=adam)
+
+first_choice = False 
+
+Y = np_utils.to_categorical(lab_to_correct(labels, first_choice), num_heuristics)
+
+model.fit(X, Y,
+          batch_size=128,
+          epochs=50,
+          verbose=0)
 
     predictions = model.predict(X_val)
     custom_acc = custom_eval(predictions, val_labels)
     
     score, acc_top3 = model.evaluate(X_val, Y_val, verbose=0)
     
-    log_file = open('bigresults/log_file.txt', 'a')
-    print('Custom validation accuracy:', custom_acc, file = log_file)
-    print('Top 3 validation accuracy:', acc_top3, file = log_file)
-    print('_________________________', file = log_file)
-    log_file.close()
-    return {'loss': -custom_acc, 'status': STATUS_OK, 'model': model}
 
-def data():
-    features, num_features = pickle.load(open('bigdata/train_features.txt', 'rb'))
-    labels, num_heuristics = pickle.load(open('bigdata/train_labels.txt', 'rb'))
 
-    X_train, X_val, train_labels, val_labels = train_test_split(features, labels, test_size=0.2, random_state=12345)
-    X_train = X_train.astype('float32')
-    X_val = X_val.astype('float32')
+model.save("new_best.h5")
 
-    return X_train, train_labels, X_val, val_labels
-
-best_run, best_model = optim.minimize(model=model,
-                                      data=data,
-                                      algo=tpe.suggest,
-                                      max_evals=eval_num,
-                                      eval_space=True,
-                                      functions=[custom_eval,lab_to_correct,top3],
-                                      trials=Trials())
-best_model.save(model_file)
-f = open(param_file, 'w') 
-print(best_run, file = f)
-f.close()
 
