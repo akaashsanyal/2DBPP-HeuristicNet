@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # File names
-TRAINDATA="bigdata/train_data.txt"
-TESTDATA="bigdata/test_data.txt"
+TRAINDATA="data/train_data.txt"
+TESTDATA="data/test_data.txt"
 TRAINFEATURES="bigdata/train_features.txt"
 TESTFEATURES="bigdata/test_features.txt"
 TRAINLABELS="bigdata/train_labels.txt"
@@ -19,7 +19,7 @@ BINLENGTH="40"
 BINWIDTH="40"
 
 # Training
-EVALS="500"
+EVALS="400"
 
 TRAINGENERATE="python3 main.py \
         --mode generate 
@@ -62,10 +62,10 @@ TESTCMD="python3 main.py \
 
 NEWTRAIN="python3 tuning.py $MODEL $PARAMS $EVALS" 
 
-$TRAINGENERATE
-$TESTGENERATE
+#$TRAINGENERATE
+#$TESTGENERATE
 
-$NEWTRAIN
+#$NEWTRAIN
 $TESTCMD
 
 #$TRAINCMD

@@ -60,8 +60,6 @@ def model(X_train, train_labels, X_val, val_labels):
     hidden_dense = {{choice([32, 64, 128])}}
     hidden_dropout = {{uniform(0, 1)}}
     num_hidden = {{choice([0,1,2,3])}}
-    last_dense = {{choice([32, 64, 128])}}
-    last_dropout = {{uniform(0, 1)}}
 
     model = Sequential()
     model.add(Dense(first_dense, input_dim=num_features))
@@ -69,7 +67,7 @@ def model(X_train, train_labels, X_val, val_labels):
     model.add(BatchNormalization())
     model.add(Dropout(first_dropout))
     
-    if num_hidden == 0:
+    if num_hidden != 0:
         model.add(Dense(hidden_dense))
         model.add(Activation(activate))
         model.add(BatchNormalization())
@@ -85,11 +83,6 @@ def model(X_train, train_labels, X_val, val_labels):
                 model.add(BatchNormalization())
                 model.add(Dropout(hidden_dropout))
     
-    model.add(Dense(last_dense, input_dim=num_features))
-    model.add(Activation(activate))
-    model.add(BatchNormalization())
-    model.add(Dropout(last_dropout))
-
     model.add(Dense(num_heuristics, activation='softmax'))
 
     adam = keras.optimizers.Adam(lr={{choice([10**-3, 10**-2, 10**-1])}})
@@ -102,7 +95,7 @@ def model(X_train, train_labels, X_val, val_labels):
     Y_val = np_utils.to_categorical(lab_to_correct(val_labels, first_choice), num_heuristics)
     
     model.fit(X_train, Y_train,
-              batch_size={{choice([64,128,256])}},
+              batch_size=128,
               epochs=50,
               verbose=0,
               validation_data=(X_val, Y_val))
