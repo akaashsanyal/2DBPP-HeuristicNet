@@ -8,3 +8,5 @@ chmod +x run.sh
 ```
 
 All parameters can be modified in `run.sh`.
+
+Python packages required to run this project are listed in `requirements.txt`.
