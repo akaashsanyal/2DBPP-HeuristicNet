@@ -9,7 +9,8 @@ TRAINLABELS="bigdata/train_labels.txt"
 TESTLABELS="bigdata/test_labels.txt"
 MODEL="bigresults/best_model.h5"
 PARAMS="bigresults/best_params.txt"
-EVALUATION="bigresults/evaluation.txt"
+#EVALUATION="bigresults/evaluation.txt"
+EVALUATION='temp_eval.txt'
 
 # Data generation
 TRAININSTANCE="30000"

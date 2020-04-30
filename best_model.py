@@ -2,15 +2,12 @@ import numpy as np
 import pickle
 import random
 import sys
-
 from sklearn.model_selection import train_test_split
-
 import keras
 from keras.models import load_model, Sequential
 from keras.layers import Dropout, Dense, BatchNormalization, Activation
 from keras.utils import np_utils
 from keras.metrics import top_k_categorical_accuracy
-
 import matplotlib.pyplot as plt
 
 def top3(y_true, y_pred):
@@ -47,6 +44,22 @@ def custom_eval(predictions, labels):
     
     return correct_count/len(index_preds)
 
+def performance(predictions, labels, results_file):
+    lnp = np.asarray(labels)
+    best = np.mean(np.min(lnp, axis=1))
+    each = np.mean(lnp, axis=0)
+    index_preds = np.argmax(predictions, axis=1)
+    scores = []
+    for lab, ind in zip(labels,index_preds):
+        scores.append(lab[ind])
+    net = np.mean(scores)
+
+    f = open(results_file, 'a')
+    print(f'Average best choice: {round(best,4)}\t\tProportion: {round(best/best,4)}', file=f)
+    for i, e in enumerate(each):
+        print(f'Average for heuristic {i}: {round(e,4)}\t\tProportion: {round(e/best,4)}', file=f)
+    print(f'Average for neural net: {round(net,4)}\t\tProportion: {round(net/best,4)}', file=f)
+    f.close()
 
 test_X, num_features = pickle.load(open('bigdata/test_features.txt', 'rb'))
 test_labels, num_heuristics = pickle.load(open('bigdata/test_labels.txt', 'rb'))
@@ -93,27 +106,31 @@ Y_val = np_utils.to_categorical(lab_to_correct(val_labels, first_choice), num_he
 
 history = model.fit(X_train, Y_train,
           batch_size=128,
-          epochs=5,
+          epochs=100,
           verbose=2,
           validation_data=(X_val, Y_val))
-'''
-# Plot history: MAE
-plt.plot(history.history['loss'], label='Loss (testing data)')
-plt.plot(history.history['val_loss'], label='Loss (validation data)')
-plt.title('MAE for Chennai Reservoir Levels')
-plt.ylabel('MAE value')
+
+predictions = model.predict(test_X)
+custom_acc = custom_eval(predictions, test_labels)
+print(custom_acc)
+Y_test = np_utils.to_categorical(lab_to_correct(test_labels, first_choice), num_heuristics)
+score, acc_top3 = model.evaluate(test_X, Y_test, verbose=1)
+
+results_file = 'temp.txt'
+
+f = open(results_file, 'w')
+print('Custom testing accuracy:', custom_acc, file=f)
+print('Top 3 testing accuracy:', acc_top3, file=f)
+f.close()
+
+performance(predictions, test_labels, results_file)
+
+plt.plot(history.history['top3'], label='Top 3 Accuracy (testing data)')
+plt.plot(history.history['val_top3'], label='Top 3 Accuracy (validation data)')
+plt.title('Top 3 Accuracy vs. Epoch')
+plt.ylabel('Top 3 Accuracy')
 plt.xlabel('Epoch')
 plt.legend(loc="best")
 plt.show()
 
-    predictions = model.predict(X_val)
-    custom_acc = custom_eval(predictions, val_labels)
-    
-    score, acc_top3 = model.evaluate(X_val, Y_val, verbose=0)
-    
-
-
-model.save("new_best.h5")
-'''
-print(history)
-
+model.save('newbest.h5')

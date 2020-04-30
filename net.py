@@ -103,10 +103,13 @@ def train(features_file, labels_file, model_file, epoch_num):
 def test(features_file, labels_file, model_file, results_file):
     features, num_features = pickle.load(open(features_file, 'rb'))
     labels, num_heuristics = pickle.load(open(labels_file, 'rb'))
-    
+
+
+    print(features_file, labels_file, model_file)
     model = load_model(model_file, custom_objects={'top3': top3})
     predictions = model.predict(features)
     custom_acc = custom_eval(predictions, labels)
+    print(custom_acc)
     Y = np_utils.to_categorical(lab_to_correct(labels), num_heuristics)
     score, acc_top3 = model.evaluate(features, Y, verbose=0)
     
