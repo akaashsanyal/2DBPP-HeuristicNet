@@ -2,22 +2,33 @@ import numpy as np
 import pickle
 import random
 import sys
-
+import argparse
 from sklearn.model_selection import train_test_split
-
 import keras
 from keras.models import load_model, Sequential
 from keras.layers import Dropout, Dense, BatchNormalization, Activation
 from keras.utils import np_utils
 from keras.metrics import top_k_categorical_accuracy
-
 from hyperopt import Trials, STATUS_OK, tpe
 from hyperas import optim
 from hyperas.distributions import choice, uniform
 
-model_file = sys.argv[1]
-param_file = sys.argv[2]
-eval_num = int(sys.argv[3])
+#train_features_file = sys.argv[1]
+#train_labels_file = sys.argv[2]
+#model_file = sys.argv[3]
+#param_file = sys.argv[4]
+#log_file = sys.argv[5]
+#eval_num = int(sys.argv[6])
+
+def my_args():
+   parser = argparse.ArgumentParser()
+   parser.add_argument('--features', help='Features file', type=str, required=True)
+   parser.add_argument('--labels', help='Labels file', type=str, required=True)
+   parser.add_argument('--model', help='Model file', type=str, required=True)
+   parser.add_argument('--params', help='Params file', type=str, required=True)
+   parser.add_argument('--evals', help='Eval number', type=int, required=True)
+   args = parser.parse_args()
+   return args
 
 def top3(y_true, y_pred):
     return top_k_categorical_accuracy(y_true, y_pred, k=3) 
@@ -105,16 +116,14 @@ def model(X_train, train_labels, X_val, val_labels):
     
     score, acc_top3 = model.evaluate(X_val, Y_val, verbose=0)
     
-    log_file = open('bigresults/log_file.txt', 'a')
-    print('Custom validation accuracy:', custom_acc, file = log_file)
-    print('Top 3 validation accuracy:', acc_top3, file = log_file)
-    print('_________________________', file = log_file)
-    log_file.close()
     return {'loss': -custom_acc, 'status': STATUS_OK, 'model': model}
 
 def data():
-    features, num_features = pickle.load(open('bigdata/train_features.txt', 'rb'))
-    labels, num_heuristics = pickle.load(open('bigdata/train_labels.txt', 'rb'))
+    args = my_args()
+    train_features_file = args.features
+    train_labels_file = args.labels
+    features, num_features = pickle.load(open(train_features_file, 'rb'))
+    labels, num_heuristics = pickle.load(open(train_labels_file, 'rb'))
 
     X_train, X_val, train_labels, val_labels = train_test_split(features, labels, test_size=0.2, random_state=12345)
     X_train = X_train.astype('float32')
@@ -122,12 +131,17 @@ def data():
 
     return X_train, train_labels, X_val, val_labels
 
+
+model_file = 'tempresults/asdfg_model.h5'
+param_file = 'tempresults/asdfghjk_params.txt'
+eval_num = 10
+
 best_run, best_model = optim.minimize(model=model,
                                       data=data,
                                       algo=tpe.suggest,
                                       max_evals=eval_num,
                                       eval_space=True,
-                                      functions=[custom_eval,lab_to_correct,top3],
+                                      functions=[my_args,custom_eval,lab_to_correct,top3],
                                       trials=Trials())
 best_model.save(model_file)
 f = open(param_file, 'w') 
