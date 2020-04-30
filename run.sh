@@ -14,16 +14,14 @@ TESTFEATURES="$DATADIR/test_features.txt"
 TRAINLABELS="$DATADIR/train_labels.txt"
 TESTLABELS="$DATADIR/test_labels.txt"
 
-MODEL="$RESULTSDIR/best_model.h5"
+TUNINGMODEL="$RESULTSDIR/tuning_model.h5"
+FINALMODEL="$RESULTSDIR/best_model.h5"
 PARAMS="$RESULTSDIR/best_params.txt"
-LOGFILE="$RESULTSDIR/tuning_log.txt"
-#EVALUATION="bigresults/evaluation.txt"
-EVALUATION="$RESULTSDIR/temp_eval.txt"
+EVALUATION="$RESULTSDIR/evaluation.txt"
+PLOT="$RESULTSDIR/accuracy_plot.png"
 
 # Data generation
 NUMINSTANCE="100"
-TRAININSTANCE="30000"
-TESTINSTANCE="10000"
 MAXBOXES="1500"
 BINLENGTH="40"
 BINWIDTH="40"
@@ -31,30 +29,7 @@ BINWIDTH="40"
 # Training
 EVALS="10"
 
-TRAINCMD="python3 main.py \
-        --mode train 
-        --dataset $TRAINDATA \
-        --features $TRAINFEATURES \
-        --labels $TRAINLABELS \
-        --model $MODEL \
-        --params $PARAMS \
-        --eval_num $EVALS"
-        
-TESTCMD="python3 main.py \
-        --mode test 
-        --dataset $TESTDATA \
-        --features $TESTFEATURES \
-        --labels $TESTLABELS \
-        --model $MODEL \
-        --evaluation $EVALUATION"
-
-TUNETRAIN="python3 tuning.py \
-        --features $TRAINFEATURES \
-        --labels $TRAINLABELS \
-        --model $MODEL \
-        --params $PARAMS \
-        --evals $EVALS" 
-
+# Commands
 GENERATE="python3 main.py \
         --mode generate \
         --train_dataset $TRAINDATA \
@@ -70,12 +45,28 @@ GENERATE="python3 main.py \
 
 MAINTRAIN="python3 main.py --mode train"
 
-#$GENERATE
-#$MAINTRAIN
+TUNETRAIN="python3 tuning.py \
+        --features $TRAINFEATURES \
+        --labels $TRAINLABELS \
+        --model $TUNINGMODEL \
+        --params $PARAMS \
+        --evals $EVALS" 
+
+TEST="python3 main.py \
+        --mode test \
+        --train_dataset $TRAINDATA \
+        --train_features $TRAINFEATURES \
+        --train_labels $TRAINLABELS \
+        --test_dataset $TESTDATA \
+        --test_features $TESTFEATURES \
+        --test_labels $TESTLABELS \
+        --model $FINALMODEL \
+        --evaluation $EVALUATION \
+        --plot $PLOT"
+
+# Run commands
+$GENERATE
+$MAINTRAIN
 $TUNETRAIN
+$TEST
 
-#$NEWTRAIN
-#$TESTCMD
-
-#$TRAINCMD
-#$TESTCMD
