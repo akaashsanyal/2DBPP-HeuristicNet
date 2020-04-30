@@ -16,14 +16,22 @@ def get_args():
                     help="Operating mode: generate features/labels, train, or test.")
     
     # File names
-    p.add_argument("--dataset", type=str, default="dataset.txt",
-                    help="Where to save/read dataset")
     p.add_argument("--model", type=str, default="best_model.h5",
                     help="Where to save/read final neural net")
-    p.add_argument("--features", type=str, default="features.txt",
-                    help="Where to dump/read features")
-    p.add_argument("--labels", type=str, default="labels.txt",
-                    help="Where to dump/read labels")
+    
+    p.add_argument("--train_dataset", type=str, default="train_dataset.txt",
+                    help="Where to save/read train dataset")
+    p.add_argument("--train_features", type=str, default="train_features.txt",
+                    help="Where to dump/read train features")
+    p.add_argument("--train_labels", type=str, default="train_labels.txt",
+                    help="Where to dump/read train labels")
+    p.add_argument("--test_dataset", type=str, default="test_dataset.txt",
+                    help="Where to save/read test dataset")
+    p.add_argument("--test_features", type=str, default="test_features.txt",
+                    help="Where to dump/read test features")
+    p.add_argument("--test_labels", type=str, default="test_labels.txt",
+                    help="Where to dump/read test labels")
+    
     p.add_argument("--params", type=str, default="params.txt",
                     help="Where to save parameters of final model")
     p.add_argument("--evaluation", type=str, default="evaluation.txt",
@@ -44,19 +52,27 @@ def get_args():
     return p.parse_args()
 
 def generate(args):
-    filepath = args.dataset
-    generate_raw_dataset(filepath, num_instances=args.num_instances, 
+    train_filepath = args.train_dataset
+    generate_raw_dataset(train_filepath, num_instances=int(args.num_instances*3/4), 
         max_boxes=args.max_boxes, max_bin_length=args.bin_length, max_bin_width=args.bin_width)
-    dataset = read_dataset(filepath)
-    generate_features(dataset, save=args.features) # generate features
-    generate_labels(dataset, save=args.labels) # results from heuristics
-    del dataset
+    train_dataset = read_dataset(train_filepath)
+    generate_features(train_dataset, save=args.train_features) # generate features
+    generate_labels(train_dataset, save=args.train_labels) # results from heuristics
+    del train_dataset
+    
+    test_filepath = args.train_dataset
+    generate_raw_dataset(test_filepath, num_instances=int(args.num_instances*1/4), 
+        max_boxes=args.max_boxes, max_bin_length=args.bin_length, max_bin_width=args.bin_width)
+    test_dataset = read_dataset(test_filepath)
+    generate_features(test_dataset, save=args.test_features) # generate features
+    generate_labels(test_dataset, save=args.test_labels) # results from heuristics
+    del test_dataset
 
 def train(args):
     print("Please run tune.sh to train and tune hyperparameters")
 
 def test(args):
-    net.test(features_file=args.features, labels_file=args.labels, 
+    net.test(features_file=args.test_features, labels_file=args.test_labels, 
         model_file=args.model, results_file=args.evaluation)
 
 if __name__ == "__main__":
