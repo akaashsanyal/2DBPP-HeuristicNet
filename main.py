@@ -38,13 +38,13 @@ def get_args():
                     help="Where to save evaluation metrics of final model")
 
     # Optional arguments
-    p.add_argument("--num_instances", type=int, default=25000,
+    p.add_argument("--num_instances", type=int, default=40000,
                     help="Number of instances in dataset")
-    p.add_argument("--max_boxes", type=int, default=500,
+    p.add_argument("--max_boxes", type=int, default=1000,
                     help="Max number of boxes per instance")
-    p.add_argument("--bin_length", type=int, default=10,
+    p.add_argument("--bin_length", type=int, default=40,
                     help="Max bin length")
-    p.add_argument("--bin_width", type=int, default=10,
+    p.add_argument("--bin_width", type=int, default=40,
                     help="Max bin width")
     p.add_argument("--eval_num", type=int, default=500,
                     help="Number of evaluations for hyperparameter search") 
