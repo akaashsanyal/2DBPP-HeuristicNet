@@ -63,6 +63,7 @@ def performance(predictions, labels, results_file):
 
 
 def test(train_features_f, train_labels_f, test_features_f, test_labels_f, model_file, results_file, plot_file):
+    num_epochs = 20
     test_X, num_features = pickle.load(open(test_features_f, 'rb'))
     test_labels, num_heuristics = pickle.load(open(test_labels_f, 'rb'))
     
@@ -108,7 +109,7 @@ def test(train_features_f, train_labels_f, test_features_f, test_labels_f, model
 
     history = model.fit(X_train, Y_train,
               batch_size=128,
-              epochs=100,
+              epochs=num_epochs,
               verbose=2,
               validation_data=(X_val, Y_val))
 

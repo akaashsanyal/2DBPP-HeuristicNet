@@ -36,6 +36,8 @@ def get_args():
                     help="Where to save parameters of final model")
     p.add_argument("--evaluation", type=str, default="evaluation.txt",
                     help="Where to save evaluation metrics of final model")
+    p.add_argument("--plot", type=str, default="accuracy_plot.png",
+                    help="Where to save accuracy plot")
 
     # Optional arguments
     p.add_argument("--num_instances", type=int, default=40000,
@@ -72,9 +74,9 @@ def train(args):
     print("Please run tune.sh to train and tune hyperparameters")
 
 def test(args):
-    net.test(features_file=args.test_features, labels_file=args.test_labels, 
-        model_file=args.model, results_file=args.evaluation)
-
+    best_model.test(args.train_features, args.train_labels, args.test_features, 
+        args.test_labels, args.model, args.evaluation, args.plot)
+    
 if __name__ == "__main__":
     ARGS = get_args()
 

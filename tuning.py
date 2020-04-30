@@ -13,13 +13,6 @@ from hyperopt import Trials, STATUS_OK, tpe
 from hyperas import optim
 from hyperas.distributions import choice, uniform
 
-#train_features_file = sys.argv[1]
-#train_labels_file = sys.argv[2]
-#model_file = sys.argv[3]
-#param_file = sys.argv[4]
-#log_file = sys.argv[5]
-#eval_num = int(sys.argv[6])
-
 def my_args():
    parser = argparse.ArgumentParser()
    parser.add_argument('--features', help='Features file', type=str, required=True)
@@ -132,9 +125,10 @@ def data():
     return X_train, train_labels, X_val, val_labels
 
 
-model_file = 'tempresults/asdfg_model.h5'
-param_file = 'tempresults/asdfghjk_params.txt'
-eval_num = 10
+args = my_args()
+model_file = args.model
+param_file = args.params
+eval_num = args.evals
 
 best_run, best_model = optim.minimize(model=model,
                                       data=data,
