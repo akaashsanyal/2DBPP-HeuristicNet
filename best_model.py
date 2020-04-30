@@ -61,6 +61,13 @@ def performance(predictions, labels, results_file):
     print(f'Average for neural net: {round(net,4)}\t\tProportion: {round(net/best,4)}', file=f)
     f.close()
 
+
+def test():
+
+    
+
+
+    return None
 test_X, num_features = pickle.load(open('bigdata/test_features.txt', 'rb'))
 test_labels, num_heuristics = pickle.load(open('bigdata/test_labels.txt', 'rb'))
 

@@ -60,46 +60,6 @@ def performance(predictions, labels, results_file):
     print(f'Average for neural net: {round(net,4)}\t\tProportion: {round(net/best,4)}', file=f)
     f.close()
 
-def train(features_file, labels_file, model_file, epoch_num):
-    features, num_features = pickle.load(open(features_file, 'rb'))
-    labels, num_heuristics = pickle.load(open(labels_file, 'rb'))
-    
-    # For labels with same number of bins, choose first occurrence
-    # as correct label
-    corrects = []
-    for lab in labels:
-        corrects.append(lab.index(min(lab)))
-
-    one_hot = np.zeros((len(corrects), num_heuristics))
-    one_hot[np.arange(len(corrects)),corrects] = 1
-
-    print("TRAINING NEURAL NETWORK")
-    model = Sequential()
-    model.add(Dense(128, activation='softplus', input_dim=num_features))
-    model.add(BatchNormalization())
-    model.add(Dropout(0.5))
-    model.add(Dense(128, activation='softplus'))
-    model.add(BatchNormalization())
-    model.add(Dropout(0.5))
-    model.add(Dense(128, activation='softplus'))
-    model.add(BatchNormalization())
-    model.add(Dropout(0.5))
-    model.add(Dense(128, activation='softplus'))
-    model.add(BatchNormalization())
-    model.add(Dropout(0.5))
-    model.add(Dense(128, activation='softplus'))
-    model.add(BatchNormalization())
-    model.add(Dropout(0.5))
-    model.add(Dense(num_heuristics, activation='softmax'))
-
-    model.compile(optimizer='adamax', \
-        loss='categorical_crossentropy', \
-        metrics=['accuracy'])
-
-    model.fit(features, one_hot, epochs=epoch_num, batch_size=32)
-
-    model.save(model_file)
-
 def test(features_file, labels_file, model_file, results_file):
     features, num_features = pickle.load(open(features_file, 'rb'))
     labels, num_heuristics = pickle.load(open(labels_file, 'rb'))

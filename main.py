@@ -2,7 +2,6 @@ import sys
 import pickle
 import argparse as ap
 import numpy as np
-import subprocess
 
 from utils import *
 from heuristics import *
@@ -53,7 +52,7 @@ def generate(args):
     del dataset
 
 def train(args):
-    subprocess.Popen(['./tune.sh %s %s %s' %(args.model,args.params,args.eval_num)], shell = True)
+    print("Please run tune.sh to train and tune hyperparameters")
 
 def test(args):
     net.test(features_file=args.features, labels_file=args.labels, 
