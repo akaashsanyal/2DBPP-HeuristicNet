@@ -5,7 +5,6 @@ import numpy as np
 
 from utils import *
 from heuristics import *
-import net
 import best_model
 
 def get_args():
