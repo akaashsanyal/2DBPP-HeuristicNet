@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # File names
-DATADIR="tempdata"
-RESULTSDIR="tempresults"
+DATADIR="data"
+RESULTSDIR="results"
 
 mkdir -p $DATADIR
 mkdir -p $RESULTSDIR
@@ -21,13 +21,13 @@ EVALUATION="$RESULTSDIR/evaluation.txt"
 PLOT="$RESULTSDIR/accuracy_plot.png"
 
 # Data generation
-NUMINSTANCE="100"
+NUMINSTANCE="40000"
 MAXBOXES="1500"
 BINLENGTH="40"
 BINWIDTH="40"
 
 # Training
-EVALS="10"
+EVALS="400"
 
 # Commands
 GENERATE="python3 main.py \

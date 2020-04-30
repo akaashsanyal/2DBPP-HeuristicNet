@@ -1,10 +1,11 @@
 argparse
 hyperas
 keras
+matplotlib
 numpy
 pickle
 random
 rectpack
 sklearn
-subprocess
 tensorflow
+tqdm

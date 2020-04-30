@@ -63,7 +63,7 @@ def performance(predictions, labels, results_file):
 
 
 def test(train_features_f, train_labels_f, test_features_f, test_labels_f, model_file, results_file, plot_file):
-    num_epochs = 20
+    num_epochs = 100
     test_X, num_features = pickle.load(open(test_features_f, 'rb'))
     test_labels, num_heuristics = pickle.load(open(test_labels_f, 'rb'))
     
@@ -110,13 +110,13 @@ def test(train_features_f, train_labels_f, test_features_f, test_labels_f, model
     history = model.fit(X_train, Y_train,
               batch_size=128,
               epochs=num_epochs,
-              verbose=2,
+              verbose=0,
               validation_data=(X_val, Y_val))
 
     predictions = model.predict(test_X)
     custom_acc = custom_eval(predictions, test_labels)
     Y_test = np_utils.to_categorical(lab_to_correct(test_labels, first_choice), num_heuristics)
-    score, acc_top3 = model.evaluate(test_X, Y_test, verbose=1)
+    score, acc_top3 = model.evaluate(test_X, Y_test, verbose=0)
 
     f = open(results_file, 'w')
     print('Custom testing accuracy:', custom_acc, file=f)

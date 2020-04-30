@@ -73,8 +73,12 @@ def train(args):
     print("Please run tune.sh to train and tune hyperparameters")
 
 def test(args):
-    best_model.test(args.train_features, args.train_labels, args.test_features, 
-        args.test_labels, args.model, args.evaluation, args.plot)
+    best = input("Is best_model.py updated with the best parameters? (y/n)   ")
+    if best.lower() == 'y':
+        best_model.test(args.train_features, args.train_labels, args.test_features, 
+            args.test_labels, args.model, args.evaluation, args.plot)
+    else:
+        print('Update the file before testing')
     
 if __name__ == "__main__":
     ARGS = get_args()
