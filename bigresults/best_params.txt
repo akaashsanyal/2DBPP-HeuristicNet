@@ -1,1 +1,0 @@
-{'activate': 'relu', 'first_dense': 32, 'first_dense_1': 32, 'first_dropout': 0.04697373821486008, 'first_dropout_1': 0.02213872171606842, 'lr': 0.01, 'num_hidden': 2}
