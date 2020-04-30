@@ -62,82 +62,74 @@ def performance(predictions, labels, results_file):
     f.close()
 
 
-def test():
-
+def test(train_features_f, train_labels_f, test_features_f, test_labels_f, model_file, results_file, plot_file):
+    test_X, num_features = pickle.load(open(test_features_f, 'rb'))
+    test_labels, num_heuristics = pickle.load(open(test_labels_f, 'rb'))
     
+    features, num_features = pickle.load(open(train_features_f, 'rb'))
+    labels, num_heuristics = pickle.load(open(train_labels_f, 'rb'))
+    
+    X_train, X_val, train_labels, val_labels = train_test_split(features, labels, test_size=0.2, random_state=12345)
+    X_train = X_train.astype('float32')
+    X_val = X_val.astype('float32')
+    
+    activate = 'relu'
+    first_dense = 32 
+    first_dropout = 0.04697373821486008
+    hidden_dense = 32
+    hidden_dropout = 0.02213872171606842
 
+    model = Sequential()
+    model.add(Dense(first_dense, input_dim=num_features))
+    model.add(Activation(activate))
+    model.add(BatchNormalization())
+    model.add(Dropout(first_dropout))
 
-    return None
-test_X, num_features = pickle.load(open('bigdata/test_features.txt', 'rb'))
-test_labels, num_heuristics = pickle.load(open('bigdata/test_labels.txt', 'rb'))
+    model.add(Dense(hidden_dense))
+    model.add(Activation(activate))
+    model.add(BatchNormalization())
+    model.add(Dropout(hidden_dropout))    
 
-features, num_features = pickle.load(open('bigdata/train_features.txt', 'rb'))
-labels, num_heuristics = pickle.load(open('bigdata/train_labels.txt', 'rb'))
+    model.add(Dense(hidden_dense))
+    model.add(Activation(activate))
+    model.add(BatchNormalization())
+    model.add(Dropout(hidden_dropout))
 
-X_train, X_val, train_labels, val_labels = train_test_split(features, labels, test_size=0.2, random_state=12345)
-X_train = X_train.astype('float32')
-X_val = X_val.astype('float32')
+    model.add(Dense(num_heuristics, activation='softmax'))
 
-activate = 'relu'
-first_dense = 32 
-first_dropout = 0.04697373821486008
-hidden_dense = 32
-hidden_dropout = 0.02213872171606842
+    adam = keras.optimizers.Adam(lr=0.01)
 
-model = Sequential()
-model.add(Dense(first_dense, input_dim=num_features))
-model.add(Activation(activate))
-model.add(BatchNormalization())
-model.add(Dropout(first_dropout))
+    model.compile(loss='categorical_crossentropy', metrics = [top3], optimizer=adam)
 
-model.add(Dense(hidden_dense))
-model.add(Activation(activate))
-model.add(BatchNormalization())
-model.add(Dropout(hidden_dropout))    
+    first_choice = False 
 
-model.add(Dense(hidden_dense))
-model.add(Activation(activate))
-model.add(BatchNormalization())
-model.add(Dropout(hidden_dropout))
+    Y_train = np_utils.to_categorical(lab_to_correct(train_labels, first_choice), num_heuristics)
+    Y_val = np_utils.to_categorical(lab_to_correct(val_labels, first_choice), num_heuristics)
 
-model.add(Dense(num_heuristics, activation='softmax'))
+    history = model.fit(X_train, Y_train,
+              batch_size=128,
+              epochs=100,
+              verbose=2,
+              validation_data=(X_val, Y_val))
 
-adam = keras.optimizers.Adam(lr=0.01)
+    predictions = model.predict(test_X)
+    custom_acc = custom_eval(predictions, test_labels)
+    Y_test = np_utils.to_categorical(lab_to_correct(test_labels, first_choice), num_heuristics)
+    score, acc_top3 = model.evaluate(test_X, Y_test, verbose=1)
 
-model.compile(loss='categorical_crossentropy', metrics = [top3], optimizer=adam)
+    f = open(results_file, 'w')
+    print('Custom testing accuracy:', custom_acc, file=f)
+    print('Top 3 testing accuracy:', acc_top3, file=f)
+    f.close()
 
-first_choice = False 
+    performance(predictions, test_labels, results_file)
 
-Y_train = np_utils.to_categorical(lab_to_correct(train_labels, first_choice), num_heuristics)
-Y_val = np_utils.to_categorical(lab_to_correct(val_labels, first_choice), num_heuristics)
+    plt.plot(history.history['top3'], label='Top 3 Accuracy (testing data)')
+    plt.plot(history.history['val_top3'], label='Top 3 Accuracy (validation data)')
+    plt.title('Top 3 Accuracy vs. Epoch')
+    plt.ylabel('Top 3 Accuracy')
+    plt.xlabel('Epoch')
+    plt.legend(loc="best")
+    plt.savefig(plot_file)
 
-history = model.fit(X_train, Y_train,
-          batch_size=128,
-          epochs=100,
-          verbose=2,
-          validation_data=(X_val, Y_val))
-
-predictions = model.predict(test_X)
-custom_acc = custom_eval(predictions, test_labels)
-print(custom_acc)
-Y_test = np_utils.to_categorical(lab_to_correct(test_labels, first_choice), num_heuristics)
-score, acc_top3 = model.evaluate(test_X, Y_test, verbose=1)
-
-results_file = 'temp.txt'
-
-f = open(results_file, 'w')
-print('Custom testing accuracy:', custom_acc, file=f)
-print('Top 3 testing accuracy:', acc_top3, file=f)
-f.close()
-
-performance(predictions, test_labels, results_file)
-
-plt.plot(history.history['top3'], label='Top 3 Accuracy (testing data)')
-plt.plot(history.history['val_top3'], label='Top 3 Accuracy (validation data)')
-plt.title('Top 3 Accuracy vs. Epoch')
-plt.ylabel('Top 3 Accuracy')
-plt.xlabel('Epoch')
-plt.legend(loc="best")
-plt.show()
-
-model.save('newbest.h5')
+    model.save(model_file)
