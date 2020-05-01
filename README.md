@@ -1,6 +1,8 @@
 # Using Deep Learning to Select Optimal 2-D Bin Packing Heuristic
 Akaash Sanyal, Teya Bergamaschi, and Lori Baxter
 
+[Using Deep Learning to Select Optimal 2-D Bin Packing Heuristic](2DBPP-HeuristicNet.pdf)
+
 Run with
 ```
 chmod +x run.sh
