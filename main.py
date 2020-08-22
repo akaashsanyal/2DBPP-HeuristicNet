@@ -54,6 +54,7 @@ def get_args():
 
 def generate(args):
     train_filepath = args.train_dataset
+    print("Generating training set")
     generate_raw_dataset(train_filepath, num_instances=int(args.num_instances*3/4), 
         max_boxes=args.max_boxes, max_bin_length=args.bin_length, max_bin_width=args.bin_width)
     train_dataset = read_dataset(train_filepath)
@@ -61,7 +62,8 @@ def generate(args):
     generate_labels(train_dataset, save=args.train_labels) # results from heuristics
     del train_dataset
     
-    test_filepath = args.train_dataset
+    print("Generating testing set")
+    test_filepath = args.test_dataset
     generate_raw_dataset(test_filepath, num_instances=int(args.num_instances*1/4), 
         max_boxes=args.max_boxes, max_bin_length=args.bin_length, max_bin_width=args.bin_width)
     test_dataset = read_dataset(test_filepath)
@@ -76,7 +78,7 @@ def test(args):
     best = input("Is best_model.py updated with the best parameters? (y/n)   ")
     if best.lower() == 'y':
         best_model.test(args.train_features, args.train_labels, args.test_features, 
-            args.test_labels, args.model, args.evaluation, args.plot)
+            args.test_labels, args.model, args.evaluation, args.plot, args.params)
     else:
         print('Update the file before testing')
     

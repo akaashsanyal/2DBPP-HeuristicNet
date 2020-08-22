@@ -21,10 +21,10 @@ EVALUATION="$RESULTSDIR/evaluation.txt"
 PLOT="$RESULTSDIR/accuracy_plot.png"
 
 # Data generation
-NUMINSTANCE="40000"
-MAXBOXES="1500"
-BINLENGTH="40"
-BINWIDTH="40"
+NUMINSTANCE="1000"
+MAXBOXES="100"
+BINLENGTH="20"
+BINWIDTH="20"
 
 # Training
 EVALS="400"
@@ -62,11 +62,12 @@ TEST="python3 main.py \
         --test_labels $TESTLABELS \
         --model $FINALMODEL \
         --evaluation $EVALUATION \
-        --plot $PLOT"
+        --plot $PLOT \
+        --params $PARAMS"
 
 # Run commands
-$GENERATE
-$MAINTRAIN
-$TUNETRAIN
+#$GENERATE
+#$MAINTRAIN
+#$TUNETRAIN
 $TEST
 

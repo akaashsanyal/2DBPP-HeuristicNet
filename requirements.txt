@@ -5,6 +5,7 @@ matplotlib
 numpy
 pickle
 random
+re
 rectpack
 sklearn
 tensorflow

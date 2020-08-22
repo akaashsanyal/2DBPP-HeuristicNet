@@ -2,6 +2,7 @@ import numpy as np
 import pickle
 import random
 import sys
+import re
 from sklearn.model_selection import train_test_split
 import keras
 from keras.models import load_model, Sequential
@@ -62,7 +63,7 @@ def performance(predictions, labels, results_file):
     f.close()
 
 
-def test(train_features_f, train_labels_f, test_features_f, test_labels_f, model_file, results_file, plot_file):
+def test(train_features_f, train_labels_f, test_features_f, test_labels_f, model_file, results_file, plot_file, params_file):
     num_epochs = 100
     test_X, num_features = pickle.load(open(test_features_f, 'rb'))
     test_labels, num_heuristics = pickle.load(open(test_labels_f, 'rb'))
@@ -73,12 +74,22 @@ def test(train_features_f, train_labels_f, test_features_f, test_labels_f, model
     X_train, X_val, train_labels, val_labels = train_test_split(features, labels, test_size=0.2, random_state=12345)
     X_train = X_train.astype('float32')
     X_val = X_val.astype('float32')
-    
-    activate = 'relu'
-    first_dense = 32 
-    first_dropout = 0.04697373821486008
-    hidden_dense = 32
-    hidden_dropout = 0.02213872171606842
+
+    f = open("results/best_params.txt", "r")
+    best_params = f.read()
+    best_params = re.split('}|{|: |, |\'', best_params)
+    best_params = list(filter(None, best_params))[:-1]
+    it = iter(best_params) 
+    param_dict = dict(zip(it, it))
+    f.close()
+
+    activate = param_dict['activate']
+    first_dense = int(param_dict['first_dense'])
+    first_dropout = float(param_dict['first_dropout'])
+    hidden_dense = int(param_dict['first_dense_1'])
+    hidden_dropout = float(param_dict['first_dropout_1'])
+    learning_rate = float(param_dict['lr'])
+    num_hidden = int(param_dict['num_hidden'])
 
     model = Sequential()
     model.add(Dense(first_dense, input_dim=num_features))
@@ -86,19 +97,15 @@ def test(train_features_f, train_labels_f, test_features_f, test_labels_f, model
     model.add(BatchNormalization())
     model.add(Dropout(first_dropout))
 
-    model.add(Dense(hidden_dense))
-    model.add(Activation(activate))
-    model.add(BatchNormalization())
-    model.add(Dropout(hidden_dropout))    
-
-    model.add(Dense(hidden_dense))
-    model.add(Activation(activate))
-    model.add(BatchNormalization())
-    model.add(Dropout(hidden_dropout))
+    for i in range(num_hidden):
+        model.add(Dense(hidden_dense))
+        model.add(Activation(activate))
+        model.add(BatchNormalization())
+        model.add(Dropout(hidden_dropout))    
 
     model.add(Dense(num_heuristics, activation='softmax'))
 
-    adam = keras.optimizers.Adam(lr=0.01)
+    adam = keras.optimizers.Adam(lr=learning_rate)
 
     model.compile(loss='categorical_crossentropy', metrics = [top3], optimizer=adam)
 
