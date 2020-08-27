@@ -10,7 +10,7 @@ from rectpack import SORT_NONE, SORT_AREA, SORT_PERI, SORT_DIFF, SORT_SSIDE, SOR
 def generate_labels(dataset, save):
     bin_algos = [PackingBin.BNF, PackingBin.BFF, PackingBin.BBF]
     pack_algos = [MaxRectsBssf, MaxRectsBaf, MaxRectsBlsf]
-    sort_algos = [SORT_NONE, SORT_AREA, SORT_PERI, SORT_DIFF, SORT_SSIDE, SORT_LSIDE, SORT_R    ATIO]
+    sort_algos = [SORT_NONE, SORT_AREA, SORT_PERI, SORT_DIFF, SORT_SSIDE, SORT_LSIDE, SORT_RATIO]
 
     num_heuristics = len(bin_algos) * len(pack_algos)
     labels = []
