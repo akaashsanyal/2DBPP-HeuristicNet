@@ -1,7 +1,7 @@
 # Directories #
 ###############
-data
-results
+data/*
+results/*
 __pycache__
 
 # Compiled source #
@@ -32,6 +32,7 @@ __pycache__
 *.sql
 *.sqlite
 .ipynb_checkpoints/
+.idea/
 
 # OS generated files #
 ######################

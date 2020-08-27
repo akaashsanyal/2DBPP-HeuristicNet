@@ -27,7 +27,8 @@ class Instance:
 # Make dataset and save to file
 def generate_raw_dataset(file_name, dist_type=0, num_instances=2000,
                          max_boxes=100, max_bin_length=10, max_bin_width=10):
-    # distribution types are: 0=uniform, 1=normal, 2=uniform for first, normal for second
+    # distribution types are: 0=uniform, 1=normal, 2=uniform for first, normal for second,
+    # 3=small,medium,large
     # do we want uniform distribution of number of boxes?
     f = open(file_name, "w")
     pbar = trange(num_instances)
@@ -38,10 +39,12 @@ def generate_raw_dataset(file_name, dist_type=0, num_instances=2000,
         bin_length = random.randint(1, max_bin_length)
         bin_width = random.randint(1, max_bin_width)
         f.write(str(bin_length) + " " + str(bin_width) + "\n")
+        # Independent uniform box dimensions
         if dist_type == 0:
             for box in range(num_boxes):
                 f.write(str(random.randint(1, bin_length)) + " " +
                         str(random.randint(1, bin_width)) + " " + str(box) + "\n")
+        # Independent normal box dimensions, mu = (1/2)bin, std = (1/6)bin
         elif dist_type == 1:
             for box in range(num_boxes):
                 box_length = int(max(min(np.random.default_rng().normal(max_bin_length / 2, max_bin_length / 6),
@@ -49,12 +52,20 @@ def generate_raw_dataset(file_name, dist_type=0, num_instances=2000,
                 box_width = int(max(min(np.random.default_rng().normal(max_bin_width / 2, max_bin_width / 6),
                                         max_bin_width), 1))
                 f.write(str(box_length) + " " + str(box_width) + " " + str(box) + "\n")
+        # Uniform length, normal width, mu = (1/2)length, std = (1/6)bin
         elif dist_type == 2:
             for box in range(num_boxes):
                 box_length = random.randint(1, bin_length)
                 box_width = int(max(min(np.random.default_rng().normal(box_length, max_bin_width / 6),
                                         max_bin_width), 1))
                 f.write(str(box_length) + " " + str(box_width) + " " + str(box) + "\n")
+        # Only small boxes
+        # Independent uniform box dimensions, capped at (1/3)bin
+        elif dist_type == 3:
+            for box in range(num_boxes):
+                f.write(str(random.randint(1, np.ceil(bin_length/3))) + " " +
+                        str(random.randint(1, np.ceil(bin_width/3))) + " " + str(box) + "\n")
+        # Small, medium, large weigthed probabilities
         else:
             for box in range(num_boxes):
                 box_length = random.randint(1, bin_length)
@@ -62,25 +73,25 @@ def generate_raw_dataset(file_name, dist_type=0, num_instances=2000,
                 resulting_category = random.randint(1, 20)
                 if category == 0:
                     if resulting_category <= 10:
-                        box_width = random.randint(1, bin_width/3)
+                        box_width = random.randint(1, np.ceil(bin_width/3))
                     elif resulting_category <= 16:
-                        box_width = random.randint(bin_width / 3, 2*bin_width / 3)
+                        box_width = random.randint(np.ceil(bin_width / 3), np.ceil(2*bin_width / 3))
                     else:
-                        box_width = random.randint(2*bin_width / 3, bin_width)
+                        box_width = random.randint(np.ceil(2*bin_width / 3), bin_width)
                 elif category == 1:
                     if resulting_category <= 5:
-                        box_width = random.randint(1, bin_width / 3)
+                        box_width = random.randint(1, np.ceil(bin_width/3))
                     elif resulting_category <= 15:
-                        box_width = random.randint(bin_width / 3, 2 * bin_width / 3)
+                        box_width = random.randint(np.ceil(bin_width / 3), np.ceil(2*bin_width / 3))
                     else:
-                        box_width = random.randint(2 * bin_width / 3, bin_width)
+                        box_width = random.randint(np.ceil(2*bin_width / 3), bin_width)
                 elif category == 2:
                     if resulting_category <= 4:
-                        box_width = random.randint(1, bin_width / 3)
+                        box_width = random.randint(1, np.ceil(bin_width/3))
                     elif resulting_category <= 10:
-                        box_width = random.randint(bin_width / 3, 2 * bin_width / 3)
+                        box_width = random.randint(np.ceil(bin_width / 3), np.ceil(2*bin_width / 3))
                     else:
-                        box_width = random.randint(2 * bin_width / 3, bin_width)
+                        box_width = random.randint(np.ceil(2*bin_width / 3), bin_width)
                 f.write(str(box_length) + " " + str(box_width) + " " + str(box) + "\n")
 
     f.close()

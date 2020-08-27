@@ -47,6 +47,8 @@ def get_args():
                     help="Max bin length")
     p.add_argument("--bin_width", type=int, default=40,
                     help="Max bin width")
+    p.add_argument("--distribution_type", type=int, default=0,
+                   help="Bin distribution type")
     p.add_argument("--eval_num", type=int, default=500,
                     help="Number of evaluations for hyperparameter search") 
 
@@ -55,7 +57,7 @@ def get_args():
 def generate(args):
     train_filepath = args.train_dataset
     print("Generating training set")
-    generate_raw_dataset(train_filepath, num_instances=int(args.num_instances*3/4), 
+    generate_raw_dataset(train_filepath, dist_type=args.distribution_type, num_instances=int(args.num_instances*3/4),
         max_boxes=args.max_boxes, max_bin_length=args.bin_length, max_bin_width=args.bin_width)
     train_dataset = read_dataset(train_filepath)
     generate_features(train_dataset, save=args.train_features) # generate features
@@ -64,7 +66,7 @@ def generate(args):
     
     print("Generating testing set")
     test_filepath = args.test_dataset
-    generate_raw_dataset(test_filepath, num_instances=int(args.num_instances*1/4), 
+    generate_raw_dataset(test_filepath, dist_type=args.distribution_type, num_instances=int(args.num_instances*1/4),
         max_boxes=args.max_boxes, max_bin_length=args.bin_length, max_bin_width=args.bin_width)
     test_dataset = read_dataset(test_filepath)
     generate_features(test_dataset, save=args.test_features) # generate features
