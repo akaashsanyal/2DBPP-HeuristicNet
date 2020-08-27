@@ -56,6 +56,33 @@ def generate_raw_dataset(file_name, dist_type=0, num_instances=2000,
                                         max_bin_width), 1))
                 f.write(str(box_length) + " " + str(box_width) + " " + str(box) + "\n")
         else:
+            for box in range(num_boxes):
+                box_length = random.randint(1, bin_length)
+                category = np.floor(3*box_length/bin_length)
+                resulting_category = random.randint(1, 20)
+                if category == 0:
+                    if resulting_category <= 10:
+                        box_width = random.randint(1, bin_width/3)
+                    elif resulting_category <= 16:
+                        box_width = random.randint(bin_width / 3, 2*bin_width / 3)
+                    else:
+                        box_width = random.randint(2*bin_width / 3, bin_width)
+                elif category == 1:
+                    if resulting_category <= 5:
+                        box_width = random.randint(1, bin_width / 3)
+                    elif resulting_category <= 15:
+                        box_width = random.randint(bin_width / 3, 2 * bin_width / 3)
+                    else:
+                        box_width = random.randint(2 * bin_width / 3, bin_width)
+                elif category == 2:
+                    if resulting_category <= 4:
+                        box_width = random.randint(1, bin_width / 3)
+                    elif resulting_category <= 10:
+                        box_width = random.randint(bin_width / 3, 2 * bin_width / 3)
+                    else:
+                        box_width = random.randint(2 * bin_width / 3, bin_width)
+                f.write(str(box_length) + " " + str(box_width) + " " + str(box) + "\n")
+
     f.close()
 
 
