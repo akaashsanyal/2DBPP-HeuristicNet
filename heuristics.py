@@ -5,12 +5,13 @@ from tqdm import tqdm
 from rectpack import newPacker, float2dec
 from rectpack import PackingBin, PackingMode
 from rectpack import MaxRectsBssf, MaxRectsBaf, MaxRectsBlsf
-from rectpack import SORT_RATIO
+from rectpack import SORT_NONE, SORT_AREA, SORT_PERI, SORT_DIFF, SORT_SSIDE, SORT_LSIDE, SORT_RATIO
 
 def generate_labels(dataset, save):
     bin_algos = [PackingBin.BNF, PackingBin.BFF, PackingBin.BBF]
     pack_algos = [MaxRectsBssf, MaxRectsBaf, MaxRectsBlsf]
-    
+    sort_algos = [SORT_NONE, SORT_AREA, SORT_PERI, SORT_DIFF, SORT_SSIDE, SORT_LSIDE, SORT_R    ATIO]
+
     num_heuristics = len(bin_algos) * len(pack_algos)
     labels = []
     # Repeat for each heuristic
