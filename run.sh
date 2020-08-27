@@ -21,10 +21,11 @@ EVALUATION="$RESULTSDIR/evaluation.txt"
 PLOT="$RESULTSDIR/accuracy_plot.png"
 
 # Data generation
-NUMINSTANCE="1000"
+NUMINSTANCE="200"
 MAXBOXES="100"
 BINLENGTH="20"
 BINWIDTH="20"
+DISTTYPE="3"
 
 # Training
 EVALS="400"
@@ -41,7 +42,8 @@ GENERATE="python3 main.py \
         --num_instances $NUMINSTANCE \
         --max_boxes $MAXBOXES \
         --bin_length $BINLENGTH \
-        --bin_width $BINWIDTH"
+        --bin_width $BINWIDTH \
+        --distribution_type $DISTTYPE"
 
 MAINTRAIN="python3 main.py --mode train"
 
@@ -66,8 +68,8 @@ TEST="python3 main.py \
         --params $PARAMS"
 
 # Run commands
-#$GENERATE
+$GENERATE
 #$MAINTRAIN
 #$TUNETRAIN
-$TEST
+#$TEST
 
